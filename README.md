@@ -1,5 +1,5 @@
 <p align="center">
-<img src="docs/img/da2lite_logo.png" width="300"/>
+<img src="docs/img/da2lite_logo.png" width="600"/>
 </p>
 
 
