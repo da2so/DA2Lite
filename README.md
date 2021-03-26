@@ -27,3 +27,10 @@ Then, you prepare runtime environment:
    ```
 
 ## Use
+
+
+
+## License
+
+The entire codebase is under [MIT license](LICENSE)
+
