@@ -48,9 +48,7 @@ class GraphGenerator(object):
             name, layer = data
             if idx == 0 or _exclude_layer(layer):
                 continue
-            print(layer)
-            print(name)
-            print('\n')
+
             layer_info[i] = {'layer': layer}
             i += 1
         return layer_info            

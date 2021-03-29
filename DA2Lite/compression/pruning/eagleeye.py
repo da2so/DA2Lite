@@ -56,7 +56,7 @@ class EagleEye(object):
                     remaining_channel = total_channel - len(prune_idx)
                     i_node['prune_idx'] = prune_idx
 
-                    print(f'layer index: {idx} \t total channel: {total_channel} \t remaining channel: {remaining_channel}')
+                    print(f'layer index: {idx:4d} \t total channel: {total_channel:4d} \t remaining channel: {remaining_channel:4d}')
                 
                 elif isinstance(i_node['layer'], nn.BatchNorm2d):
                     down_key = 1
@@ -66,7 +66,6 @@ class EagleEye(object):
                     
                     i_node['prune_idx'] = node_graph[key - down_key]['prune_idx']
 
-                #print(i_node['group'])
             
             new_model = copy.deepcopy(self.model)
 
@@ -120,7 +119,8 @@ class EagleEye(object):
                     layer.weight.data = layer.weight.data[:, keep_idx].clone()
 
                 i += 1
-
+            from torchsummary import summary
+            summary(new_model.cuda(), input_size=(3,32,32))
             return new_model
 
     
