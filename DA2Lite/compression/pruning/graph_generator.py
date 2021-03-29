@@ -36,8 +36,7 @@ class GraphGenerator(object):
         
         node_graph, group_set = self._get_combined_graph(layer_info, parsed_onnx_graph)
         
-        for key in node_graph.keys():
-            print(node_graph[key])
+
         return node_graph, group_set
 
     
@@ -49,7 +48,9 @@ class GraphGenerator(object):
             name, layer = data
             if idx == 0 or _exclude_layer(layer):
                 continue
-
+            print(layer)
+            print(name)
+            print('\n')
             layer_info[i] = {'layer': layer}
             i += 1
         return layer_info            
@@ -161,10 +162,10 @@ class GraphGenerator(object):
             elif isinstance(layer_info[key]['layer'], nn.Linear) and is_first_linear:
                 down_key = 1
 
-                while 'group' not in layer_info[key - down_key]:
+                while 'input_conv_layers' not in layer_info[key - down_key]:
                     down_key += 1
                 
-                layer_info[key]['group'] = layer_info[key - down_key]['group']
+                layer_info[key]['input_conv_layers'] = [layer_info[key - down_key]['name']]
                 is_first_linear = False
 
         return layer_info, group_set
