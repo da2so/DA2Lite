@@ -8,14 +8,21 @@ MODEL:
   NAME: resnet18
   NUM_CLASSES: 10
   PRE_TRAINED:
-    IS_USE: False
-    RETRAINED: False
-    PATH: './saved_models/cifar10_vgg16_bn.pt'
+    IS_USE: True
+    PATH: './cifar10_resnet18.pt'
 
+    
 TRAIN:
-  OPTIMIZER: sgd # [sgd, adam] are available.
+  IS_USE: True 
+  OPTIMIZER: sgd
+  OPTIMIZER_ARGS:
+      MOMENTUM : 0.9
+      WEIGHT_DECAY: 5e-4
   LOSS: categorical_crossentropy # [categorical_crossentropy, kld, mae, mse] are available
   SCHEDULER: stepLR # [stepLR]
+  SCHEDULER_ARGS:
+    STEP_SIZE: 60
+    GAMMA: 0.1
   BATCH_SIZE: 128
   EPOCHS: 140
   LR: 0.1

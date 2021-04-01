@@ -34,12 +34,14 @@ if __name__ == '__main__':
     
     device = cfg_util.get_device()
 
-    #train_loader, test_loader = cfg_util.load_dataset()
+    train_loader, test_loader = cfg_util.load_dataset()
     
-    train_loader, test_loader = 1,1
+    #train_loader, test_loader = 1,1
     model = cfg_util.load_model()
     """
     trainer = Classification(cfg_util=cfg_util,
+                            train_obj=cfg_util.cfg.TRAIN,
+                            prefix='origin',
                             model=model,
                             train_loader=train_loader,
                             test_loader=test_loader,
@@ -47,11 +49,13 @@ if __name__ == '__main__':
 
     trained_model = trainer.build()
     """
-    from DA2Lite.compression.pruning.eagleeye import EagleEye
+
+    from DA2Lite.core.compress import Compressor
     model = model.cuda()
-    eagleeye_obj = EagleEye(cfg_util=cfg_util,
-                            model=model,
-                            train_loader=train_loader,
-                            test_loader=test_loader,
-                            device=device)
-    eagleeye_obj.build()
+
+    DA2lite = Compressor(cfg_util=cfg_util,
+                        model=model,
+                        train_loader=train_loader,
+                        test_loader=test_loader,
+                        device=device)
+    DA2lite.build()

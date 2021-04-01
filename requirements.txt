@@ -2,3 +2,5 @@ ptflops==0.6.4
 yacs==0.1.8
 torch==1.7.0+cu101
 tqdm==4.51.0
+tensorly==0.5.1
+scipy==1.5.4

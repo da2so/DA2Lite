@@ -1,16 +1,21 @@
-PRUNING:
+
+FD:
   POST_TRAIN:
     IS_USE: True
     OPTIMIZER: sgd
+    OPTIMIZER_ARGS:
+      MOMENTUM: 0.9
+      WEIGHT_DECAY: 5e-4
     LOSS: categorical_crossentropy # [categorical_crossentropy, kld, mae, mse] are available
-    SCHEDULER: stepLR # [stepLR]
+    SCHEDULER: cosineannealLR # [stepLR, cosineannealLR]
+    SCHEDULER_ARGS:
+      T_MAX: 30
     BATCH_SIZE: 256
     EPOCHS: 30
-    LR: 0.01
+    LR: 0.001
   
-  STRATEGY:
-    NAME: MinMaxStrategy
-    PRUNING_RATIO: [0.0, 0.7]
-  
-  CRITERIA:
-    NAME: L1Criteria
+  METHOD:
+    NAME: Tucker
+    START_IDX: 4
+    RANK: 6
+    
