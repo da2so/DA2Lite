@@ -1,0 +1,42 @@
+DATASET:
+  NAME: cifar10 # Choice of ['cifar10', 'cifar100']
+  IMG_SHAPE: [3, 32, 32] # [Channel, Height, Width] of the dataset
+  DATA_AUG: True  # If True, standard data augmentation will be used.
+
+MODEL: 
+  NAME: resnet50 # 
+  NUM_CLASSES: 100 # The number of classes 
+  PRE_TRAINED:
+    IS_USE: False # Load your pretrained model???
+    PATH: './cifar10_resnet50.pt' # Model path for the pretrained model path
+ 
+TRAIN:
+  IS_USE: True # Train a model??
+  OPTIMIZER: sgd # Choice of ['sgd', 'adam']
+  OPTIMIZER_ARGS: # Arguments of a choosed optimizer
+      MOMENTUM : 0.9 #for sgd
+      WEIGHT_DECAY: 5e-4 #for sgd
+      """
+      BETAS = (0.9, 0.999) for adam
+      EPSILON = 1e-8  for adam
+      """
+  LOSS: categorical_crossentropy # Choice of [categorical_crossentropy, kld, mae, mse]
+  SCHEDULER: stepLR # [stepLR, exponentialLR, cosineannealLR]
+  SCHEDULER_ARGS: # Arguments of a choosed scheduler
+    STEP_SIZE: 60 # for stepLR
+    GAMMA: 0.1 # for stepLR
+    """
+    GAMMA: 0.95 for exponentialLR
+
+    T_MAX: 140(The number of epochs) for cosineannealLR
+    """ 
+  BATCH_SIZE: 128 # Batch size
+  EPOCHS: 140 # Epochs
+  LR: 0.1 # Learning rate
+
+GPU:
+  IS_USE: True # Use CUDA GPU?
+
+
+
+
