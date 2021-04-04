@@ -3,11 +3,11 @@
 
 There are two configuration folders to operate <span style="color:DodgerBlue">**DA2Lite**</span>. 
 
-The first is a **train** folder that contains .yaml files for train confuration options (e.g. model, dataset, optimizer, loss, ...).
+The first is a **train** folder that contains .yaml files for train confuration options (e.g. model, dataset, optimizer, loss, ...).  
 And, a configuration file in **compress** folder allows to user select what compressipon methods will be used sequentially. Besides, when after compression a model, you can control post-train configurations using its .yaml file.
 
 
-## CONFIGURATION STRUCTURE
+## Configuration setting
 
 The followings indicate example configurations and available choices of configurations (represented by comments).
 
@@ -65,35 +65,39 @@ The followings indicate example configurations and available choices of configur
             IS_USE: True # Use post-train after pruning?
             OPTIMIZER: sgd # Choice of ['sgd', 'adam']
             OPTIMIZER_ARGS:  # Arguments of a choosed optimizer
-            MOMENTUM: 0.9 #for sgd
-            WEIGHT_DECAY: 5e-4 #for sgd
-            """
-            BETAS = (0.9, 0.999) for adam
-            EPSILON = 1e-8  for adam
-            """
+                MOMENTUM: 0.9 #for sgd
+                WEIGHT_DECAY: 5e-4 #for sgd
+                """
+                BETAS = (0.9, 0.999) for adam
+                EPSILON = 1e-8  for adam
+                """
             LOSS: categorical_crossentropy # Choice of [categorical_crossentropy, kld, mae, mse]
             SCHEDULER: cosineannealLR # [stepLR, exponentialLR, cosineannealLR]
             SCHEDULER_ARGS:  # Arguments of a choosed scheduler
-            T_MAX: 30 #for 
-            """
-            STEP_SIZE: 60 # for stepLR
-            GAMMA: 0.1 # for stepLR
+                T_MAX: 30 #for 
+                """
+                STEP_SIZE: 60 # for stepLR
+                GAMMA: 0.1 # for stepLR
 
-            GAMMA: 0.95 # for exponentialLR
-            """
+                GAMMA: 0.95 # for exponentialLR
+                """
             BATCH_SIZE: 256 # Batch size
             EPOCHS: 30 # Epochs
             LR: 0.001 # Learning rate
   
     METHOD:
-        CRITERIA: L1Criteria # Choice of ['L1Criteria', 'L2Criteria', 'RandomCriteria']
+        CRITERIA: EagleEye # Choice of ['EagleEye', 'L1Criteria', 'L2Criteria', 'RandomCriteria']
+        CRITERIA_ARGS: 
+            NUM_CANDIDATES: 20 # for EagleEye
         STRATEGY: MinMaxStrategy # Choice of ['MinMaxStrategy', 'RandomStrategy', 'StaticStrategy']
-        PRUNING_RATIO: [0.0, 0.5] # for MinMaxStrategy
-        """
-        PRUNING_RATIO: None # for RandomStrategy
+        STRATEGY_ARGS:
+            PRUNING_RATIO: [0.0, 0.5] # for MinMaxStrategy
+            """
+            PRUNING_RATIO: None # for RandomStrategy
 
-        PRUNING_RATIO: 0.5 # for StaticStrategy
-        """
+            PRUNING_RATIO: 0.5 # for StaticStrategy
+            """
+
 
 
     FD:
@@ -101,12 +105,12 @@ The followings indicate example configurations and available choices of configur
             IS_USE: True # Use post-train after filter decomposition??
             OPTIMIZER: sgd
             OPTIMIZER_ARGS:
-            MOMENTUM: 0.9
-            WEIGHT_DECAY: 5e-4
+                MOMENTUM: 0.9
+                WEIGHT_DECAY: 5e-4
             LOSS: categorical_crossentropy 
             SCHEDULER: cosineannealLR 
             SCHEDULER_ARGS:
-            T_MAX: 30
+                T_MAX: 30
             BATCH_SIZE: 256
             EPOCHS: 30
             LR: 0.001

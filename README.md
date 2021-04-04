@@ -30,6 +30,18 @@ Then, you prepare runtime environment:
 
 
 
+### TODO
+
+* [ ] Multi-GPU training
+* [ ] PyTorchMobile conversion
+* [ ] Train a model based on a custom dataset
+* [ ] Rand-augmentation for improving accuracy
+* [ ] Make model zoo
+* [ ] Up-to-date model architectures.
+* [ ] Train a model for object detection (further future...)
+* [ ] Compression methods for object detection (further future...)
+
+
 ## License
 
 The entire codebase is under [MIT license](LICENSE)
