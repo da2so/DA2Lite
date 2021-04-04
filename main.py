@@ -5,8 +5,8 @@ import argparse
 from DA2Lite.trainer.classification import Classification
 from DA2Lite.core.config import CfgUtil
 from DA2Lite.core.log import setup_logger
+from DA2Lite.core.compress import Compressor
 
-import sys
 
 
 def get_parser():
@@ -36,9 +36,8 @@ if __name__ == '__main__':
 
     train_loader, test_loader = cfg_util.load_dataset()
     
-    #train_loader, test_loader = 1,1
     model = cfg_util.load_model()
-    """
+    
     trainer = Classification(cfg_util=cfg_util,
                             train_obj=cfg_util.cfg.TRAIN,
                             prefix='origin',
@@ -59,3 +58,4 @@ if __name__ == '__main__':
                         test_loader=test_loader,
                         device=device)
     DA2lite.build()
+    """

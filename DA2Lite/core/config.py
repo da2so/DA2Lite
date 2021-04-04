@@ -11,10 +11,10 @@ import DA2Lite.trainer.utils as utils
 
 def get_cfg_defaults():
 
-    _C = CN()
+    _C = CN(new_allowed=True)
     
     ################
-    # Train Config #
+    # Default Train Config #
     ################
     
     _C.DATASET = CN()
@@ -27,13 +27,15 @@ def get_cfg_defaults():
     _C.MODEL.NUM_CLASSES = 10
     _C.MODEL.PRE_TRAINED = CN()
     _C.MODEL.PRE_TRAINED.IS_USE = True
-    _C.MODEL.PRE_TRAINED.RETRAINED = False
     _C.MODEL.PRE_TRAINED.PATH = './saved_models/cifar10_resnet18.pt'
 
     _C.TRAIN = CN()
+    _C.TRAIN.IS_USE = False
     _C.TRAIN.OPTIMIZER = 'sgd'
+    _C.TRAIN.OPTIMIZER_ARGS = CN(new_allowed=True)
     _C.TRAIN.LOSS = 'categorical_crossentropy'
     _C.TRAIN.SCHEDULER = 'stepLR'
+    _C.TRAIN.SCHEDULER_ARGS = CN(new_allowed=True)
     _C.TRAIN.BATCH_SIZE = 256
     _C.TRAIN.EPOCHS = 150
     _C.TRAIN.LR = 0.1
@@ -43,28 +45,6 @@ def get_cfg_defaults():
     _C.GPU = CN()
     _C.GPU.IS_USE = True
 
-    ######################
-    # Compression Config #
-    ######################
-    
-    _C.PRUNING = CN()
-
-    _C.PRUNING.POST_TRAIN = CN()
-    _C.PRUNING.POST_TRAIN.IS_USE = True
-    _C.PRUNING.POST_TRAIN.OPTIMIZER = 'sgd'
-    _C.PRUNING.POST_TRAIN.LOSS = 'categorical_crossentropy'
-    _C.PRUNING.POST_TRAIN.SCHEDULER = 'stepLR'
-    _C.PRUNING.POST_TRAIN.BATCH_SIZE = 256
-    _C.PRUNING.POST_TRAIN.EPOCHS = 30
-    _C.PRUNING.POST_TRAIN.LR = 0.001
-
-    _C.PRUNING.STRATEGY = CN()
-    _C.PRUNING.STRATEGY.NAME = 'MinMaxStrategy'
-    _C.PRUNING.STRATEGY.PRUNING_RATIO = [0.0, 0.7]  
-
-    _C.PRUNING.CRITERIA = CN()
-    _C.PRUNING.CRITERIA.NAME = 'L1Critera'
-    
     return _C.clone()
 
 class CfgUtil():
@@ -147,6 +127,7 @@ class CfgUtil():
     def get_optimizer(self, model):
 
         optimizer_name = self.train_config.OPTIMIZER
+        optimizer_args = self.train_config.OPTIMIZER_ARGS
         lr = self.train_config.LR
         
         try: 
@@ -154,20 +135,20 @@ class CfgUtil():
         except:
             raise ValueError(f'Invalid optimizer name: {optimizer_name}')
 
-        optimizer = optimizer_func(model, lr)
+        optimizer = optimizer_func(model, lr, optimizer_args)
         return optimizer
 
 
     def get_scheduler(self, optimizer):
 
         scheduler_name = self.train_config.SCHEDULER
-        
+        scheduler_args = self.train_config.SCHEDULER_ARGS
         try: 
             scheduler_func = getattr(utils, scheduler_name)
         except:
             raise ValueError(f'Invalid scheduler name: {scheduler_name}')
 
-        scheduler = scheduler_func(optimizer)
+        scheduler = scheduler_func(optimizer, scheduler_args)
         return scheduler
 
     def get_device(self):

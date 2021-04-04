@@ -11,38 +11,42 @@ from DA2Lite.core.log import get_logger
 
 logger = get_logger(__name__)
 
+
 class Classification(TrainerBase):
     def __init__(self, 
                  cfg_util,
+                 train_obj,
+                 prefix,
                  model,
                  train_loader,
                  test_loader,
                  device):
 
         super().__init__(cfg_util,
+                        prefix,
                         model,
                         train_loader,
                         test_loader,
                         device)
 
-        tr_conf = self.cfg.TRAIN
-        self.pretrained_conf = self.cfg.MODEL.PRE_TRAINED
+        self.is_train = train_obj.IS_USE
 
-        self.epochs = tr_conf.EPOCHS
+        self.epochs = train_obj.EPOCHS
         self.optimizer = cfg_util.get_optimizer(self.model)
         self.loss = cfg_util.get_loss()
 
         self.scheduler = None
-        if tr_conf.SCHEDULER:
+        if train_obj.SCHEDULER:
             self.scheduler = cfg_util.get_scheduler(self.optimizer)
-
     
     def train(self, epoch):
-
+        
+        for param in self.model.parameters():
+            param.requires_grad = True
         self.model.train()
 
         total_correct = 0
-        loop = tqdm(enumerate(self.train_loader), total= len(self.train_loader)-1, leave=False)
+        loop = tqdm(enumerate(self.train_loader), total=len(self.train_loader)-1, leave=False)
         for i, (images, labels) in loop:
             self.optimizer.zero_grad()
 
@@ -89,24 +93,26 @@ class Classification(TrainerBase):
             logger.info(f'Test  - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {avg_loss.data.item()}')
         else:
             logger.info(f'Test Accuracy: {acc}, Loss {avg_loss.data.item()}')
+        return acc
     
     def evaluate(self):
-        self.test(-1)
+        return self.test(-1)
+
 
     def build(self):
         logger.info(f'loading {self.model_name}..\n')
         
-        if self.pretrained_conf.IS_USE and not self.pretrained_conf.RETRAINED:
-            self.evaluate()
-        else:
+        if self.is_train:
             for epoch in range(1, self.epochs+1):
                 self.train(epoch)
                 self.test(epoch)
                 
                 if self.scheduler != None:
                     self.scheduler.step()
+        else:
+            self.evaluate()
 
         logger.info(f'The trained model is saved in {self.save_path}\n')        
-        torch.save(self.model.state_dict(), self.save_path)
+        torch.save(self.model, self.save_path)
 
         return self.model

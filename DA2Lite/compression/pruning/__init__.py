@@ -1,2 +1,2 @@
-from DA2Lite.compression.pruning.strategy_generator import MinMaxStrategy, StaticStrategy, RandomStrategy
-from DA2Lite.compression.pruning.criteria import L1Criteria, L2Criteria, RandomCriteria
+from .strategy import MinMaxStrategy, StaticStrategy, RandomStrategy
+from .criteria import EagleEye, L1Criteria, L2Criteria, RandomCriteria

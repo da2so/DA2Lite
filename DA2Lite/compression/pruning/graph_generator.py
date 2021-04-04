@@ -8,16 +8,9 @@ import torch.nn as nn
 import torch
 from torchsummary import summary
 
-PRUNABLE_LAYERS = [ nn.modules.conv._ConvNd, nn.modules.batchnorm._BatchNorm, nn.Linear, nn.PReLU]
+from DA2Lite.compression.utils import _exclude_layer
+#PRUNABLE_LAYERS = [ nn.modules.conv._ConvNd, nn.modules.batchnorm._BatchNorm, nn.Linear, nn.PReLU]
 
-def _exclude_layer(layer):
-
-    if isinstance(layer, nn.Sequential):
-        return True
-    if not 'torch.nn' in str(layer.__class__):
-        return True
-
-    return False
 
 class GraphGenerator(object):
     def __init__(self, model, img_shape, save_dir):

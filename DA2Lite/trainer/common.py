@@ -7,6 +7,7 @@ class TrainerBase(ABC):
     def __init__(
         self,
         cfg_util,
+        prefix,
         model,
         train_loader,
         test_loader,
@@ -23,8 +24,12 @@ class TrainerBase(ABC):
         self.train_loader = train_loader
         self.test_loader = test_loader
 
-        file_name = f'{self.dataset_name}_{self.model_name}.pt'
-        self.save_path = os.path.join(self.cfg.SAVE_DIR, file_name)
+        save_dir = os.path.join(self.cfg.SAVE_DIR, 'models/')
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+
+        file_name = f'{prefix}_{self.dataset_name}_{self.model_name}.pt'
+        self.save_path = os.path.join(save_dir, file_name)
 
     @abstractmethod
     def train(self):

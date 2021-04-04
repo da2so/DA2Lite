@@ -1,5 +1,5 @@
 
-import DA2Lite.compression.pruning as pruning
+from DA2Lite.compression import pruning
 
 def load_strategy(strategy_name, group_set, pruning_ratio):
 
@@ -8,21 +8,19 @@ def load_strategy(strategy_name, group_set, pruning_ratio):
     except:
         raise ValueError(f'Invalid strategy name: {strategy_name}')
 
-
     strategy = strategy_class(group_set, pruning_ratio)
     
     return strategy
 
-
-
-def load_criteria(criteria_name):
+def load_criteria(criteria_name, **kwargs):
 
     try: 
         criteria_class = getattr(pruning, criteria_name)
     except:
-        raise ValueError(f'Invalid strategy name: {criteria_name}')
+        raise ValueError(f'Invalid criteria name: {criteria_name}')
 
-
-    criteria = criteria_class()
+    criteria = criteria_class(**kwargs)
     
     return criteria
+
+
