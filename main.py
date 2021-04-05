@@ -13,13 +13,13 @@ def get_parser():
     parser = argparse.ArgumentParser(description="NET2net for builtin configs")
     parser.add_argument(
         "--train-config-file",
-        default="configs/train/a.yaml",
+        default="configs/train/cifar10_vgg16_bn.yaml",
         metavar="FILE",
         help="path to train config file",
     )
     parser.add_argument(
         "--compress-config-file",
-        default="configs/compress/a.yaml",
+        default="configs/compress/tucker.yaml",
         metavar="FILE",
         help="path to compress config file",
     )
@@ -47,9 +47,8 @@ if __name__ == '__main__':
                             device=device)
 
     trained_model = trainer.build()
-    """
+    
 
-    from DA2Lite.core.compress import Compressor
     model = model.cuda()
 
     DA2lite = Compressor(cfg_util=cfg_util,
@@ -58,4 +57,4 @@ if __name__ == '__main__':
                         test_loader=test_loader,
                         device=device)
     DA2lite.build()
-    """
+    

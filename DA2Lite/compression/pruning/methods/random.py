@@ -2,7 +2,7 @@ import random
 
 import torch
 
-from DA2Lite.compression.pruning.methods.common import CriteriaBase
+from DA2Lite.compression.pruning.methods.criteria_base import CriteriaBase
 
 
 

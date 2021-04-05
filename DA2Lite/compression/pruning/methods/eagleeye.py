@@ -2,7 +2,7 @@
 import torch
 
 from DA2Lite.compression.pruning.methods.lN_norm import L1Criteria
-from DA2Lite.compression.pruning.methods.common import CriteriaBase
+from DA2Lite.compression.pruning.methods.criteria_base import CriteriaBase
 
 
 class EagleEye(CriteriaBase):
@@ -19,8 +19,8 @@ class EagleEye(CriteriaBase):
 
         idx = kwargs['idx']
 
-        new_model.to(device)
-        new_model.train()
+        pruned_model.to(device)
+        pruned_model.train()
 
         max_iters = 10
         max_samples = len(train_loader.dataset) // 30
@@ -31,19 +31,19 @@ class EagleEye(CriteriaBase):
             for images, label in train_loader:
                 batches += batch_size
                 images = images.to(device)
-                out = new_model(images)
+                out = pruned_model(images)
 
                 if batches >= max_samples:
                     break
         
-        new_model.eval()
+        pruned_model.eval()
 
         total_correct = 0            
         with torch.no_grad():
             for i, (images, labels) in enumerate(train_loader):
                 images, labels = images.to(device), labels.to(device)
 
-                outputs = new_model(images)
+                outputs = pruned_model(images)
                 pred = outputs.data.max(1)[1]
                 total_correct += pred.eq(labels.data.view_as(pred)).sum()
     
@@ -52,8 +52,8 @@ class EagleEye(CriteriaBase):
 
         if best_model['acc'] < acc:
             best_model['acc'] = acc
-            best_model['model'] = new_model
+            best_model['model'] = pruned_model
             best_model['index'] = idx
             best_model['pruning_info'] = pruning_info
         
-    return best_model
+        return best_model

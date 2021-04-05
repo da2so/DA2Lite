@@ -40,7 +40,7 @@ class Classification(TrainerBase):
             self.scheduler = cfg_util.get_scheduler(self.optimizer)
     
     def train(self, epoch):
-        
+
         for param in self.model.parameters():
             param.requires_grad = True
         self.model.train()
@@ -91,16 +91,16 @@ class Classification(TrainerBase):
         
         if epoch != -1:
             logger.info(f'Test  - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {avg_loss.data.item()}')
-        else:
-            logger.info(f'Test Accuracy: {acc}, Loss {avg_loss.data.item()}')
-        return acc
+        #else:
+        #    logger.info(f'Test Accuracy: {acc}, Loss {avg_loss.data.item()}')
+        return acc, avg_loss.data.item()
     
     def evaluate(self):
         return self.test(-1)
 
 
     def build(self):
-        logger.info(f'loading {self.model_name}..\n')
+        logger.info(f'loading {self.prefix}_{self.model_name}..')
         
         if self.is_train:
             for epoch in range(1, self.epochs+1):
@@ -109,10 +109,10 @@ class Classification(TrainerBase):
                 
                 if self.scheduler != None:
                     self.scheduler.step()
-        else:
-            self.evaluate()
-
+        
         logger.info(f'The trained model is saved in {self.save_path}\n')        
         torch.save(self.model, self.save_path)
+        
+        self.model_summary()
 
         return self.model

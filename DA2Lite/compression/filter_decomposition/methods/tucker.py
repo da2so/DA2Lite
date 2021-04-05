@@ -18,12 +18,17 @@ def estimate_ranks(layer):
     _, diag_0, _, _ = EVBMF(unfold_0)
     _, diag_1, _, _ = EVBMF(unfold_1)
     ranks = [diag_0.shape[0], diag_1.shape[1]]
+
     return ranks
 
 
 def tucker_decomposition(layer, rank, device):
-    ranks = estimate_ranks(layer)
-    print(layer._get_name(), "VBMF Estimated ranks", ranks)
+
+    if isinstance(rank, int):
+        ranks = rank
+    elif rank == 'VBMF':
+        ranks = estimate_ranks(layer)
+
     core, [last, first] = \
         partial_tucker(layer.weight.data.cpu().numpy(),
                         modes=[0, 1],
@@ -79,4 +84,4 @@ def tucker_decomposition(layer, rank, device):
     core_layer.weight.data = core_tensor
 
     new_layers = [first_layer, core_layer, last_layer]
-    return nn.Sequential(*new_layers)
+    return nn.Sequential(*new_layers), ranks

@@ -4,6 +4,9 @@ import torch.nn as nn
 
 from DA2Lite.compression.utils import _exclude_layer
 from DA2Lite.compression.filter_decomposition import methods
+from DA2Lite.core.log import get_logger
+
+logger = get_logger(__name__)
 
 cfg_to_method = {'Tucker': 'tucker_decomposition'}
 
@@ -72,14 +75,14 @@ class FilterDecomposition(object):
             if _exclude_layer(layer):
                 continue
 
-            if isinstance(layer, torch.nn.modules.conv.Conv2d):
+            if isinstance(layer, nn.modules.conv.Conv2d):
                 if self.start_idx <= current_idx:
                     module, last_name = self.get_module_of_layer(new_model, name)
-                    module._modules[str(last_name)] = fd_method(layer, self.rank, self.device)
+                    module._modules[str(last_name)], ranks = fd_method(layer, self.rank, self.device)
                     
+                    in_channels, out_channels = layer.in_channels, layer.out_channels
+                    
+                    logger.info(f'In, Out channels are decomposed: [{in_channels}, {out_channels}] -> [{ranks[1]}, {ranks[0]}] on "{name}" layer')
                 current_idx += 1
-            
-        from torchsummary import summary
-        summary(new_model, (3,32,32))
 
         return new_model

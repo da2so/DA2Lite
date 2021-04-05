@@ -2,6 +2,9 @@
 
 from DA2Lite import compression
 from DA2Lite.trainer.classification import Classification
+from DA2Lite.core.log import get_logger
+
+logger = get_logger(__name__)
 
 cfg_to_compress = {'PRUNING': 'Pruner', 'FD': 'FilterDecomposition'}
 
@@ -26,6 +29,7 @@ class Compressor(object):
 
         self.device = device
 
+        logger.info(f'Compression Start!\n')
 
     def _get_compressor(self, compress_name):
         
@@ -37,6 +41,7 @@ class Compressor(object):
         return compressor_class
     
     def build(self):
+
         compressed_model = self.origin_model
         compress_num = 1
         for compress_name in self.compress_step:
@@ -64,7 +69,9 @@ class Compressor(object):
                                     train_loader=self.train_loader,
                                     test_loader=self.test_loader,
                                     device=self.device)
-            trainer.evalutae()
+
+            test_acc, test_loss = trainer.test(-1)
+            logger.info(f'Test accuracy right after {compress_name}: {test_acc*1e2} %\n')
             compressed_model = trainer.build()
 
             import sys
