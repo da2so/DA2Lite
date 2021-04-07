@@ -1,18 +1,20 @@
 
 import torch
 
-from DA2Lite.compression.pruning.methods.lN_norm import L1Criteria
+from DA2Lite.compression.pruning.methods.ln_norm import L1Criteria
 from DA2Lite.compression.pruning.methods.criteria_base import CriteriaBase
+from DA2Lite.core.log import get_logger
 
+logger = get_logger(__name__)
 
 class EagleEye(CriteriaBase):
     def __init__(self, **kwargs):
         criteria_args = kwargs['criteria_args']
         
         self.num_candidates = criteria_args.NUM_CANDIDATES
-
-    def get_prune_idx(self, weights, amount=0.0):
-        indices = L1Criteria(weights, amount)
+        
+    def get_prune_idx(self, weights, pruning_ratio=0.0):
+        indices = L1Criteria().get_prune_idx(weights, pruning_ratio)
         return indices
 
     def get_model(self, pruned_model, pruning_info, best_model, train_loader, device, **kwargs):
@@ -48,7 +50,7 @@ class EagleEye(CriteriaBase):
                 total_correct += pred.eq(labels.data.view_as(pred)).sum()
     
         acc = float(total_correct) / len(train_loader.dataset)
-        print(f'Adaptive-BN-based accuracy for {idx}-th prunned model: {acc}')
+        logger.info(f'Adaptive-BN-based accuracy for {idx}-th prunned model: {acc}')
 
         if best_model['acc'] < acc:
             best_model['acc'] = acc

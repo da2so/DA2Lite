@@ -24,7 +24,6 @@ def setup_logger():
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
 
-    
     ch = logging.StreamHandler(stream=sys.stdout)
     ch.setLevel(logging.DEBUG)
     ch.setFormatter(BASIC_FMT)
@@ -32,12 +31,18 @@ def setup_logger():
 
     save_dir = _get_logdir()
 
-    filename = os.path.join(save_dir, 'train.log')
-    fh = logging.FileHandler(filename = filename)
-    fh.setLevel(logging.DEBUG)
-    fh.setFormatter(BASIC_FMT)
-    root_logger.addHandler(fh)
+    filename = os.path.join(save_dir, 'process.log')
+    spr = logging.FileHandler(filename = filename)
+    spr.setLevel(logging.INFO)
+    spr.setFormatter(BASIC_FMT)
+    root_logger.addHandler(spr)
     
+    filename = os.path.join(save_dir, 'specific_process.log')
+    pr = logging.FileHandler(filename = filename)
+    pr.setLevel(logging.DEBUG)
+    pr.setFormatter(BASIC_FMT)
+    root_logger.addHandler(pr)
+
     return save_dir
 
 

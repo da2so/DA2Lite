@@ -7,10 +7,10 @@ import torch
 class CriteriaBase(ABC):
 
     def __init__(self, **kwargs):
-        self.num_candidate = 1 
+        self.num_candidates = 1 
     
     @abstractclassmethod
-    def get_prune_idx(self, weights, amount=0.0):
+    def get_prune_idx(self, weights, pruning_ratio=0.0):
         raise NotImplementedError
 
     

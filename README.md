@@ -41,7 +41,6 @@ Then, you prepare runtime environment:
 * [ ] Train a model for object detection (further future...)
 * [ ] Compression methods for object detection (further future...)
 
-
 ## License
 
 The entire codebase is under [MIT license](LICENSE)

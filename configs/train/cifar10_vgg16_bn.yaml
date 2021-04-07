@@ -5,15 +5,14 @@ DATASET:
 
 
 MODEL:
-  NAME: resnet18
+  NAME: vgg16_bn
   NUM_CLASSES: 10
   PRE_TRAINED:
     IS_USE: False
-    PATH: './cifar10_resnet18.pt'
-
+    PATH: './saved_models/origin_cifar10_vgg16_bn.pt'
     
 TRAIN:
-  IS_USE: True 
+  IS_USE: False 
   OPTIMIZER: sgd
   OPTIMIZER_ARGS:
       MOMENTUM : 0.9

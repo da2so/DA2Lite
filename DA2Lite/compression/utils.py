@@ -8,3 +8,17 @@ def _exclude_layer(layer):
         return True
 
     return False
+
+
+
+def get_layer_type(layer):
+    
+    if isinstance(layer, nn.modules.conv.Conv2d) and layer.groups <= 1:
+        return 'Conv'
+    elif isinstance(layer, nn.modules.conv.Conv2d) and layer.groups > 1:
+        return 'GroupConv'
+    elif isinstance(layer, nn.modules.batchnorm.BatchNorm2d):
+        return 'BN'
+    elif isinstance(layer, nn.modules.linear.Linear):
+        return 'Linear'
+    

@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch
 from torchsummary import summary
 
-from DA2Lite.compression.utils import _exclude_layer
+from DA2Lite.compression.utils import _exclude_layer, get_layer_type
 #PRUNABLE_LAYERS = [ nn.modules.conv._ConvNd, nn.modules.batchnorm._BatchNorm, nn.Linear, nn.PReLU]
 
 
@@ -37,8 +37,8 @@ class GraphGenerator(object):
 
         layer_info = OrderedDict()
         i = 0 
-        for idx, data in enumerate(model.named_modules()):
-            name, layer = data
+        for idx, layer in enumerate(model.modules()):
+
             if idx == 0 or _exclude_layer(layer):
                 continue
 
@@ -72,93 +72,103 @@ class GraphGenerator(object):
         
         for key in node_graph.keys():
 
-
             if node_graph[key]['op_type'] == 'Conv':
 
                 node_graph[key]['group'] = idx
-                idx += 1
                 
-                if 'input' not in node_graph[key]['input'][0]:
-
-                    node_graph[key]['input_conv_layers'] = []
-                    for i_input in node_graph[key]['input']:
-                        while 'group' not in node_graph[i_input]:
-                            i_input = node_graph[i_input]['input'][0]
+                if  idx != 0:
+                    node_graph[key]['input_convs'] = []
+                    
+                    i_input = node_graph[key]['input'][0]
+                    while 'group' not in node_graph[i_input]:
+                        i_input = node_graph[i_input]['input'][0]
                     
                     if node_graph[i_input]['op_type'] == 'Add':
-                        node_graph[key]['input_conv_layers'].extend(node_graph[i_input]['input_conv_layers'])
+                        node_graph[key]['input_convs'].extend(node_graph[i_input]['input_convs'])
                     elif node_graph[i_input]['op_type'] == 'Conv':
-                        node_graph[key]['input_conv_layers'].extend([node_graph[i_input]['name']])
+                        node_graph[key]['input_convs'].extend([node_graph[i_input]['name']])
+
+                idx += 1
 
             if node_graph[key]['op_type'] == 'Add':
                 assert len(node_graph[key]['input']) >= 2
                 
-                group_list = []
+                group_min_val = 1e4
                 input_list = []
-                node_graph[key]['input_conv_layers'] = []
+                node_graph[key]['input_convs'] = []
+
                 for i_input in node_graph[key]['input']:
                     while 'group' not in node_graph[i_input]:
                         i_input = node_graph[i_input]['input'][0]
                     
                     input_list.append(i_input)
-                    group_list.append(node_graph[i_input]['group']) 
+                    if node_graph[i_input]['group'] < group_min_val:
+                        group_min_val = node_graph[i_input]['group']
 
                     if node_graph[i_input]['op_type'] == 'Add':
-                        node_graph[key]['input_conv_layers'].extend(node_graph[i_input]['input_conv_layers'])
+                        node_graph[key]['input_convs'].extend(node_graph[i_input]['input_convs'])
                     elif node_graph[i_input]['op_type'] == 'Conv':
-                        node_graph[key]['input_conv_layers'].extend([node_graph[i_input]['name']])
+                        node_graph[key]['input_convs'].extend([node_graph[i_input]['name']])
                         
 
-
-                min_val = min(group_list)
-
                 for i_input in input_list:
-                    if node_graph[i_input]['group'] != min_val:
-                        node_graph[i_input]['group'] = min_val            
+                    if node_graph[i_input]['group'] != group_min_val:
+                        node_graph[i_input]['group'] = group_min_val            
                 
-                node_graph[key]['group'] = min_val
+                node_graph[key]['group'] = group_min_val
                 idx += 1
         
         node_graph = {k: v for k, v in node_graph.items() if node_graph[k]['op_type'] == 'Conv'}
         
         return node_graph
 
+
+    def _find_input_convs(self, key, layer_info):
+        down_key = 1
+
+        while 'name' not in layer_info[key - down_key]:
+            down_key += 1
+        
+        return down_key
+
     def _get_combined_graph(self, layer_info, onnx_graph):
 
         is_first_linear = True
         group_set = set()
+
         for key in layer_info.keys():
-            
-            if isinstance(layer_info[key]['layer'], nn.Conv2d):
+            layer_type = get_layer_type(layer_info[key]['layer'])
+
+            if layer_type == 'Conv':
                 assert 'group' in onnx_graph[next(iter(onnx_graph))]
 
                 i_graph = onnx_graph[next(iter(onnx_graph))]
 
                 layer_info[key]['group'] = i_graph['group']
                 layer_info[key]['name'] = i_graph['name']
-                if 'input_conv_layers' in i_graph:
-                    layer_info[key]['input_conv_layers'] = i_graph['input_conv_layers']
+                if 'input_convs' in i_graph:
+                    layer_info[key]['input_convs'] = i_graph['input_convs']
+                else:
+                    layer_info[key]['input_convs'] = None
                 group_set.add(i_graph['group'])
                 del onnx_graph[next(iter(onnx_graph))]
                 
-            elif isinstance(layer_info[key]['layer'], nn.BatchNorm2d):
-                down_key = 1
+            elif layer_type == 'BN':
                 
-                while 'group' not in layer_info[key - down_key]:
-                    down_key += 1
+                down_key = self._find_input_convs(key, layer_info)
                 
-                layer_info[key]['group'] = layer_info[key - down_key]['group']
-            
-        
-            elif isinstance(layer_info[key]['layer'], nn.Linear) and is_first_linear:
-                down_key = 1
+                layer_info[key]['input_convs'] = [layer_info[key - down_key]['name']]
 
-                while 'input_conv_layers' not in layer_info[key - down_key]:
-                    down_key += 1
+        
+            elif layer_type == 'Linear' and is_first_linear:
+
+                down_key = self._find_input_convs(key, layer_info)
                 
-                layer_info[key]['input_conv_layers'] = [layer_info[key - down_key]['name']]
+                layer_info[key]['input_convs'] = [layer_info[key - down_key]['name']]
                 is_first_linear = False
 
         return layer_info, group_set
 
         
+
+

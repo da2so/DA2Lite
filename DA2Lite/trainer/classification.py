@@ -68,7 +68,7 @@ class Classification(TrainerBase):
             loop.set_postfix(Accuracy=acc, Loss=loss.item())
 
             if i == len(self.train_loader) -1:
-                logger.info(f'Train - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {loss.item()}')
+                logger.debug(f'Train - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {loss.item()}')
     
     
     def test(self, epoch):
@@ -90,7 +90,7 @@ class Classification(TrainerBase):
         acc = float(total_correct) / len(self.test_loader.dataset)
         
         if epoch != -1:
-            logger.info(f'Test  - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {avg_loss.data.item()}')
+            logger.debug(f'Test  - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {avg_loss.data.item()}')
         #else:
         #    logger.info(f'Test Accuracy: {acc}, Loss {avg_loss.data.item()}')
         return acc, avg_loss.data.item()
@@ -102,6 +102,7 @@ class Classification(TrainerBase):
     def build(self):
         logger.info(f'loading {self.prefix}_{self.model_name}..')
         
+
         if self.is_train:
             for epoch in range(1, self.epochs+1):
                 self.train(epoch)
@@ -111,7 +112,7 @@ class Classification(TrainerBase):
                     self.scheduler.step()
         
         logger.info(f'The trained model is saved in {self.save_path}\n')        
-        torch.save(self.model, self.save_path)
+        torch.save(self.model.state_dict(), self.save_path)
         
         self.model_summary()
 

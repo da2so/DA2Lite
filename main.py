@@ -13,13 +13,13 @@ def get_parser():
     parser = argparse.ArgumentParser(description="NET2net for builtin configs")
     parser.add_argument(
         "--train-config-file",
-        default="configs/train/cifar10_vgg16_bn.yaml",
+        default="configs/train/cifar10_densenet121.yaml",
         metavar="FILE",
         help="path to train config file",
     )
     parser.add_argument(
         "--compress-config-file",
-        default="configs/compress/tucker.yaml",
+        default="configs/compress/eagleeye.yaml",
         metavar="FILE",
         help="path to compress config file",
     )

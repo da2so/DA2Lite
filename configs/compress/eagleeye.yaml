@@ -1,0 +1,22 @@
+PRUNING:
+  POST_TRAIN:
+    IS_USE: True # Use post-train after pruning?
+    OPTIMIZER: sgd # Choice of ['sgd', 'adam']
+    OPTIMIZER_ARGS:  # Arguments of a choosed optimizer
+      MOMENTUM: 0.9 #for sgd
+      WEIGHT_DECAY: 5e-4 #for sgd
+    LOSS: categorical_crossentropy # Choice of [categorical_crossentropy, kld, mae, mse]
+    SCHEDULER: cosineannealLR # [stepLR, exponentialLR, cosineannealLR]
+    SCHEDULER_ARGS:  # Arguments of a choosed scheduler
+      T_MAX: 50 #for 
+    BATCH_SIZE: 256 # Batch size
+    EPOCHS: 50 # Epochs
+    LR: 0.001 # Learning rate
+  
+  METHOD:
+    CRITERIA: EagleEye # Choice of ['EagleEye', 'L1Criteria', 'L2Criteria', 'RandomCriteria']
+    CRITERIA_ARGS: 
+      NUM_CANDIDATES: 20 # for EagleEye
+    STRATEGY: MinMaxStrategy # Choice of ['MinMaxStrategy', 'RandomStrategy', 'StaticStrategy']
+    STRATEGY_ARGS:
+      PRUNING_RATIO: [0.0, 0.5] # for MinMaxStrategy

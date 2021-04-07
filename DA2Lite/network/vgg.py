@@ -49,7 +49,7 @@ def vgg11_bn(num_classes):
 def vgg13(num_classes):
     return VGG(num_classes=num_classes, cfg=cfgs['VGG13'], batch_norm=False)
 
-def vgg13_bn(num_classess):
+def vgg13_bn(num_classes):
     return VGG(num_classes=num_classes, cfg=cfgs['VGG13'], batch_norm=True)
 
 def vgg16(num_classes):

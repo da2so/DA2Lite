@@ -1,7 +1,7 @@
 
 FD:
   POST_TRAIN:
-    IS_USE: True
+    IS_USE: False
     OPTIMIZER: sgd
     OPTIMIZER_ARGS:
       MOMENTUM: 0.9
@@ -12,10 +12,10 @@ FD:
       T_MAX: 50
     BATCH_SIZE: 256
     EPOCHS: 50
-    LR: 0.001
+    LR: 0.01
   
   METHOD:
     NAME: Tucker
     START_IDX: 6
-    RANK: 6
+    RANK: VBMF
     
