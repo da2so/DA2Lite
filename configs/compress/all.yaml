@@ -1,6 +1,7 @@
 PRUNING:
   POST_TRAIN:
     IS_USE: True # Use post-train after pruning?
+    NAME: basic # Choice of ['basic', 'fskd']
     OPTIMIZER: sgd # Choice of ['sgd', 'adam']
     OPTIMIZER_ARGS:  # Arguments of a choosed optimizer
       MOMENTUM: 0.9 #for sgd
@@ -39,6 +40,7 @@ PRUNING:
 FD:
   POST_TRAIN:
     IS_USE: True # Use post-train after filter decomposition??
+    NAME: basic # Choice of ['basic', 'fskd']
     OPTIMIZER: sgd
     OPTIMIZER_ARGS:
       MOMENTUM: 0.9

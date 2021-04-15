@@ -17,10 +17,10 @@ class EagleEye(CriteriaBase):
         indices = L1Criteria().get_prune_idx(weights, pruning_ratio)
         return indices
 
-    def get_model(self, pruned_model, pruning_info, best_model, train_loader, device, **kwargs):
+    def get_model(self, pruned_model, pruning_info, node_graph, best_model, train_loader, device, **kwargs):
 
         idx = kwargs['idx']
-
+    
         pruned_model.to(device)
         pruned_model.train()
 
@@ -30,7 +30,7 @@ class EagleEye(CriteriaBase):
         batches = 0
 
         for j in range(max_iters):
-            for images, label in train_loader:
+            for images, labels in train_loader:
                 batches += batch_size
                 images = images.to(device)
                 out = pruned_model(images)
@@ -55,7 +55,9 @@ class EagleEye(CriteriaBase):
         if best_model['acc'] < acc:
             best_model['acc'] = acc
             best_model['model'] = pruned_model
+            best_model['node_graph'] = node_graph
             best_model['index'] = idx
             best_model['pruning_info'] = pruning_info
         
+        del images, labels
         return best_model

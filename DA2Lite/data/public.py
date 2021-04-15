@@ -25,7 +25,7 @@ class Public_Dataset(ABC):
         if data_aug: 
             train_trans_list += common(img_size)
         else:
-            train_trans_list += transforms.Resize((img_size, img_size))
+            train_trans_list += [transforms.Resize(size=img_size)]
         
         train_trans_list += normalize(mean, std)
 
@@ -58,7 +58,7 @@ class CIFAR10_Dataset(Public_Dataset):
                 img_shape,
                 data_dir,
                 mean=(0.4914, 0.4822, 0.4465),
-                std=(0.4914, 0.4822, 0.4465)):
+                std=(0.2023, 0.1994, 0.2010)):
 
         super().__init__(data_dir)
         self.normlaize(data_aug, img_shape, mean, std)
@@ -76,7 +76,7 @@ class CIFAR100_Dataset(Public_Dataset):
                 img_shape,
                 data_dir,
                 mean=(0.4914, 0.4822, 0.4465),
-                std=(0.4914, 0.4822, 0.4465)):
+                std=(0.2023, 0.1994, 0.2010)):
 
         super().__init__(data_dir)
         self.normlaize(data_aug, img_shape, mean, std)

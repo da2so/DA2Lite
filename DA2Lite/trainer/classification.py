@@ -4,7 +4,6 @@ from tqdm import tqdm
 
 import torch
 from torch.autograd import Variable
-from torch.utils.data import DataLoader 
 
 from DA2Lite.trainer.common import TrainerBase
 from DA2Lite.core.log import get_logger
@@ -15,28 +14,29 @@ logger = get_logger(__name__)
 class Classification(TrainerBase):
     def __init__(self, 
                  cfg_util,
-                 train_obj,
+                 train_cfg,
                  prefix,
                  model,
                  train_loader,
                  test_loader,
-                 device):
+                 device,
+                 **kwargs):
 
         super().__init__(cfg_util,
                         prefix,
-                        model,
                         train_loader,
                         test_loader,
                         device)
+        self.model = model.to(device)
+        self.train_cfg = train_cfg
+        self.is_train = train_cfg.IS_USE
 
-        self.is_train = train_obj.IS_USE
-
-        self.epochs = train_obj.EPOCHS
+        self.epochs = train_cfg.EPOCHS
         self.optimizer = cfg_util.get_optimizer(self.model)
         self.loss = cfg_util.get_loss()
 
         self.scheduler = None
-        if train_obj.SCHEDULER:
+        if train_cfg.SCHEDULER:
             self.scheduler = cfg_util.get_scheduler(self.optimizer)
     
     def train(self, epoch):
@@ -50,9 +50,7 @@ class Classification(TrainerBase):
         for i, (images, labels) in loop:
             self.optimizer.zero_grad()
 
-            images, labels = Variable(images), Variable(labels)
-
-            images, labels = images.to(self.device), labels.to(self.device)
+            images, labels = Variable(images).to(self.device), Variable(labels).to(self.device)
 
             outputs = self.model(images)
             loss = self.loss(outputs, labels)
@@ -70,7 +68,7 @@ class Classification(TrainerBase):
             if i == len(self.train_loader) -1:
                 logger.debug(f'Train - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {loss.item()}')
     
-    
+
     def test(self, epoch):
 
         self.model.eval()
@@ -100,20 +98,39 @@ class Classification(TrainerBase):
 
 
     def build(self):
-        logger.info(f'loading {self.prefix}_{self.model_name}..')
-        
+        logger.info(f'loading {self.prefix}_{self.model_name}...')
 
         if self.is_train:
+            self._print_train_cfg()
             for epoch in range(1, self.epochs+1):
                 self.train(epoch)
-                self.test(epoch)
+                test_acc, test_loss = self.test(epoch)
                 
                 if self.scheduler != None:
                     self.scheduler.step()
-        
+        else:
+            test_acc, test_loss = self.evaluate()
         logger.info(f'The trained model is saved in {self.save_path}\n')        
         torch.save(self.model.state_dict(), self.save_path)
         
-        self.model_summary()
+        self.model_summary(test_acc, test_loss, self.model)
 
         return self.model
+
+    def _print_train_cfg(self):
+        split_train_cfg = str(self.train_cfg).split('\n')
+        
+        num_dummy = 60
+        train_txt = ' Train configuration '.center(num_dummy,' ')
+        border_txt = '-'*num_dummy
+       
+        logger.info(f'+{border_txt}+')
+        logger.info(f'|{train_txt}|')
+        logger.info(f'+{border_txt}+')
+        logger.info(f'|{" ".ljust(num_dummy)}|')
+        for i_tr_cfg in split_train_cfg:
+            if 'IS_USE' in i_tr_cfg:
+                continue
+            logger.info(f'| {i_tr_cfg.ljust(num_dummy-1)}|')
+        logger.info(f'|{" ".ljust(num_dummy)}|')
+        logger.info(f'+{border_txt}+\n')

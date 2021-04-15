@@ -3,16 +3,16 @@ DATASET:
   IMG_SHAPE: [3, 32, 32] 
   DATA_AUG: True
 
-
 MODEL:
   NAME: densenet121
   NUM_CLASSES: 10
   PRE_TRAINED:
-    IS_USE: True
-    PATH: './saved_models/origin_cifar10_vgg19_bn.pt'
-    #PATH: './saved_models/cifar10_resnet18.pt'
+    IS_USE: False
+    #PATH: './saved_models/origin_cifar10_vgg19_bn.pt'
+    PATH: './saved_models/origin_cifar10_densenet121.pt'
+  
 TRAIN:
-  IS_USE: False 
+  IS_USE: True 
   OPTIMIZER: sgd
   OPTIMIZER_ARGS:
       MOMENTUM : 0.9

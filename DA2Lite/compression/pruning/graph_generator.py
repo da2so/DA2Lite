@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch
 from torchsummary import summary
 
-from DA2Lite.compression.utils import _exclude_layer, get_layer_type
+from DA2Lite.core.layer_utils import _exclude_layer, get_layer_type
 #PRUNABLE_LAYERS = [ nn.modules.conv._ConvNd, nn.modules.batchnorm._BatchNorm, nn.Linear, nn.PReLU]
 
 
@@ -38,7 +38,6 @@ class GraphGenerator(object):
         layer_info = OrderedDict()
         i = 0 
         for idx, layer in enumerate(model.modules()):
-
             if idx == 0 or _exclude_layer(layer):
                 continue
 
@@ -58,6 +57,7 @@ class GraphGenerator(object):
 
         for i in range(len(onnx_model.graph.node)):
             i_node = onnx_model.graph.node[i]
+
             if 'Conv' == i_node.op_type:
                 node_graph[i_node.output[0]] = {'input': [i_node.input[0]], 'op_type': i_node.op_type, 'name': i_node.name}
             else:
@@ -73,11 +73,11 @@ class GraphGenerator(object):
         for key in node_graph.keys():
 
             if node_graph[key]['op_type'] == 'Conv':
-
                 node_graph[key]['group'] = idx
                 
                 if  idx != 0:
                     node_graph[key]['input_convs'] = []
+                    node_graph[key]['concat_op'] = []
                     
                     i_input = node_graph[key]['input'][0]
                     while 'group' not in node_graph[i_input]:
@@ -85,24 +85,29 @@ class GraphGenerator(object):
                     
                     if node_graph[i_input]['op_type'] == 'Add':
                         node_graph[key]['input_convs'].extend(node_graph[i_input]['input_convs'])
+                    elif node_graph[i_input]['op_type'] == 'Concat':
+                        node_graph[key]['input_convs'].extend(node_graph[i_input]['input_convs'])
+                        node_graph[key]['concat_op'].extend(node_graph[i_input]['input_convs'])
                     elif node_graph[i_input]['op_type'] == 'Conv':
                         node_graph[key]['input_convs'].extend([node_graph[i_input]['name']])
 
                 idx += 1
 
-            if node_graph[key]['op_type'] == 'Add':
+            elif node_graph[key]['op_type'] == 'Add':
                 assert len(node_graph[key]['input']) >= 2
                 
                 group_min_val = 1e4
                 input_list = []
                 node_graph[key]['input_convs'] = []
+                node_graph[key]['add_op'] = []
+                node_graph[key]['concat_op'] = []
 
                 for i_input in node_graph[key]['input']:
                     while 'group' not in node_graph[i_input]:
                         i_input = node_graph[i_input]['input'][0]
                     
                     input_list.append(i_input)
-                    if node_graph[i_input]['group'] < group_min_val:
+                    if node_graph[i_input]['group'] != -1 and node_graph[i_input]['group'] < group_min_val:
                         group_min_val = node_graph[i_input]['group']
 
                     if node_graph[i_input]['op_type'] == 'Add':
@@ -117,7 +122,31 @@ class GraphGenerator(object):
                 
                 node_graph[key]['group'] = group_min_val
                 idx += 1
-        
+
+            elif node_graph[key]['op_type'] == 'Concat':
+                assert len(node_graph[key]['input']) >= 2
+                
+                node_graph[key]['input_convs'] = []
+                node_graph[key]['concat_op'] = []
+
+                group_num_for_concat = -1
+                for i_input in node_graph[key]['input']:
+                    if 'i_input' not in node_graph[i_input]:
+                        break
+                    while 'group' not in node_graph[i_input]:
+                        i_input = node_graph[i_input]['input'][0]
+                    
+                    if node_graph[i_input]['op_type'] == 'Add':
+                        node_graph[key]['input_convs'].extend(node_graph[i_input]['input_convs'])
+                    elif node_graph[i_input]['op_type'] == 'Concat':
+                        node_graph[key]['input_convs'].extend(node_graph[i_input]['input_convs'])
+                        node_graph[key]['concat_op'].extend(node_graph[i_input]['input_convs'])
+                    elif node_graph[i_input]['op_type'] == 'Conv':
+                        node_graph[key]['input_convs'].extend([node_graph[i_input]['name']])
+
+                    node_graph[key]['group'] = group_num_for_concat
+
+
         node_graph = {k: v for k, v in node_graph.items() if node_graph[k]['op_type'] == 'Conv'}
         
         return node_graph

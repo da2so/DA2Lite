@@ -2,6 +2,7 @@
 FD:
   POST_TRAIN:
     IS_USE: False
+    NAME: basic
     OPTIMIZER: sgd
     OPTIMIZER_ARGS:
       MOMENTUM: 0.9
@@ -15,7 +16,7 @@ FD:
     LR: 0.01
   
   METHOD:
-    NAME: Tucker
+    DECOMPOSITION: Tucker
     START_IDX: 6
     RANK: VBMF
     

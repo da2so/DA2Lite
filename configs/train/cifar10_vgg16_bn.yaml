@@ -9,10 +9,10 @@ MODEL:
   NUM_CLASSES: 10
   PRE_TRAINED:
     IS_USE: False
-    PATH: './saved_models/origin_cifar10_vgg16_bn.pt'
-    
+    #PATH: './saved_models/origin_cifar10_vgg16_bn.pt'
+    PATH: './saved_models/test_vgg.pt'
 TRAIN:
-  IS_USE: False 
+  IS_USE: True 
   OPTIMIZER: sgd
   OPTIMIZER_ARGS:
       MOMENTUM : 0.9

@@ -14,7 +14,7 @@ class CriteriaBase(ABC):
         raise NotImplementedError
 
     
-    def get_model(self, pruned_model, pruining_ratio, best_model, train_loader, device, **kwargs):
+    def get_model(self, pruned_model, pruining_ratio, node_graph, best_model, train_loader, device, **kwargs):
 
         pruned_model.to(device)
         
@@ -34,6 +34,7 @@ class CriteriaBase(ABC):
         if best_model['acc'] < acc:
             best_model['acc'] = acc
             best_model['model'] = pruned_model
+            best_model['node_graph'] = node_graph
             best_model['pruning_info'] = pruning_info
         
         return best_model

@@ -2,7 +2,7 @@ import copy
 
 import torch.nn as nn
 
-from DA2Lite.compression.utils import _exclude_layer
+from DA2Lite.core.layer_utils import _exclude_layer, get_layer_type, get_module_of_layer
 from DA2Lite.compression.filter_decomposition import methods
 from DA2Lite.core.log import get_logger
 
@@ -12,7 +12,7 @@ cfg_to_method = {'Tucker': 'tucker_decomposition'}
 
 class FilterDecomposition(object):
     def __init__(self,
-                compress_cfg,
+                fd_cfg,
                 model,
                 device,
                 **kwargs):
@@ -20,9 +20,10 @@ class FilterDecomposition(object):
         self.origin_model = model
         self.device = device
 
-        self.start_idx = compress_cfg.START_IDX
-        self.fd_name = compress_cfg.NAME
-        self.rank = compress_cfg.RANK
+        self.start_idx = fd_cfg.START_IDX
+        self.fd_name = fd_cfg.DECOMPOSITION
+        self.rank = fd_cfg.RANK
+
     
     def _get_method(self, method_name):
         
@@ -33,35 +34,6 @@ class FilterDecomposition(object):
         
         return method_func
 
-    def parse_layer_name(self, name):
-        
-        name_split = name.split('.')
-        name_list = []
-        
-        for i_name in name_split:
-            if i_name.isnumeric():
-                name_list.append(int(i_name))
-            else:
-                name_list.append(i_name)
-        
-        return name_list
-
-    def get_module_of_layer(self, new_model, l_name):
-
-        l_name_list = l_name = self.parse_layer_name(l_name)
-        last_name = l_name_list.pop()
-
-        module = new_model
-
-        for i_name in l_name_list:
-            if isinstance(i_name, str):
-                module = getattr(module, i_name)
-            elif isinstance(i_name, int):
-                module = module[i_name]
-            else:
-                raise ValueError(f'layer name is unvalid: {i_name}')
-        
-        return module, last_name
                 
     def build(self):
         
@@ -72,17 +44,20 @@ class FilterDecomposition(object):
         current_idx = 1
 
         for name, layer in new_model.named_modules():
+            layer_type = get_layer_type(layer)
+
             if _exclude_layer(layer):
                 continue
 
-            if isinstance(layer, nn.modules.conv.Conv2d):
+            if layer_type == 'Conv':
                 if self.start_idx <= current_idx:
-                    module, last_name = self.get_module_of_layer(new_model, name)
+                    module, last_name = get_module_of_layer(new_model, name)
                     module._modules[str(last_name)], ranks = fd_method(layer, self.rank, self.device)
                     
                     in_channels, out_channels = layer.in_channels, layer.out_channels
                     
-                    logger.info(f'In, Out channels are decomposed: [{in_channels}, {out_channels}] -> [{ranks[1]}, {ranks[0]}] on "{name}" layer')
+                    logger.info(f'In, Out channels are decomposed: [{in_channels}, {out_channels}] -> [{ranks[1]}, {ranks[0]}] at "{name}" layer')
+                    
                 current_idx += 1
 
         return new_model

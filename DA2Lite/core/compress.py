@@ -1,7 +1,7 @@
 
 
 from DA2Lite import compression
-from DA2Lite.trainer.classification import Classification
+from DA2Lite import trainer
 from DA2Lite.core.log import get_logger
 
 logger = get_logger(__name__)
@@ -40,6 +40,16 @@ class Compressor(object):
         
         return compressor_class
     
+    def _get_trainer(self, trainer_name):
+        
+        if trainer_name == 'basic':
+            trainer_class = getattr(trainer, 'Classification')
+        else:
+            trainer_class = getattr(trainer, 'KnowledgeDistillation')
+        
+        return trainer_class
+
+
     def build(self):
 
         compressed_model = self.origin_model
@@ -50,7 +60,8 @@ class Compressor(object):
             
             compress_cfg = self.cfg[compress_name].METHOD
 
-            
+            self._print_compress_cfg(compress_cfg)
+
             compressor = compress_class(compress_cfg=compress_cfg,
                                         model=compressed_model,
                                         device=self.device,
@@ -59,20 +70,47 @@ class Compressor(object):
 
             compressed_model = compressor.build()
 
+            pruning_node_info = None
+            if cfg_to_compress[compress_name] == 'Pruner':
+                pruning_node_info = compressor.get_pruning_node_info()
+
             train_cfg = self.cfg[compress_name].POST_TRAIN
             prefix = f'compress_{compress_num}'
 
-            trainer = Classification(cfg_util=self.cfg_util,
-                                    train_obj=train_cfg,
+            trainer_class = self._get_trainer(train_cfg.NAME)
+
+            trainer = trainer_class(cfg_util=self.cfg_util,
+                                    train_cfg=train_cfg,
                                     prefix=prefix,
                                     model=compressed_model,
                                     train_loader=self.train_loader,
                                     test_loader=self.test_loader,
-                                    device=self.device)
+                                    device=self.device,
+                                    origin_model=self.origin_model,
+                                    compress_name=cfg_to_compress[compress_name],
+                                    pruning_node_info=pruning_node_info
+                                    )
 
-            test_acc, test_loss = trainer.test(-1)
-            logger.info(f'Test accuracy right after {compress_name}: {test_acc*1e2} %\n')
+            test_acc, test_loss = trainer.evaluate()
+            logger.info(f'Test accuracy right after {compress_name}: {round(test_acc*1e2,2)} %\n')
+
+            
             compressed_model = trainer.build()
 
             import sys
             sys.exit()
+
+    def _print_compress_cfg(self, compress_cfg):
+        split_compress_cfg = str(compress_cfg).split('\n')
+        
+        num_dummy = 60
+        train_txt = ' Compress configuration '.center(num_dummy)
+        border_txt = "-"*num_dummy
+        logger.info(f'+{border_txt}+')
+        logger.info(f'|{train_txt}|')
+        logger.info(f'+{border_txt}+')
+        logger.info(f'|{" ".ljust(num_dummy)}|')
+        for i_comp_cfg in split_compress_cfg:
+            logger.info(f'| {i_comp_cfg.ljust(num_dummy-1)}|')
+        logger.info(f'|{" ".ljust(num_dummy)}|')
+        logger.info(f'+{border_txt}+\n')

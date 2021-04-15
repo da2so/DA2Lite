@@ -4,7 +4,7 @@ import sys
 import os
 
 BASE_DIR = './log/' 
-BASIC_FMT = logging.Formatter("[%(asctime)s] %(name)s %(levelname)s: %(message)s", datefmt="%m/%d %H:%M:%S")
+BASIC_FMT = logging.Formatter("[%(asctime)s] %(levelname)s: %(message)s", datefmt="%m/%d %M:%S")
 
 
 def _get_logdir():

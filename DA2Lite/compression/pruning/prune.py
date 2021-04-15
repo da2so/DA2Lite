@@ -5,7 +5,7 @@ import random
 import torch
 import torch.nn as nn
 
-from DA2Lite.compression.utils import _exclude_layer, get_layer_type
+from DA2Lite.core.layer_utils import _exclude_layer, get_layer_type
 from DA2Lite.compression.pruning.graph_generator import GraphGenerator
 from DA2Lite.compression.pruning.utils import load_strategy, load_criteria
 from DA2Lite.core.log import get_logger
@@ -39,13 +39,13 @@ class Pruner(object):
 
         self.pruning_method = load_criteria(criteria_name=self.pruning_cfg.CRITERIA, 
                                             criteria_args=self.criteria_args)
-    def set_prune_idx(self, group_to_ratio):
+
+    def set_prune_idx(self, group_to_ratio, node_graph):
         
         pruning_info = []
+        for idx, key in enumerate(node_graph.keys()):
 
-        for idx, key in enumerate(self.node_graph.keys()):
-
-            i_node = self.node_graph[key]
+            i_node = node_graph[key]
             layer_type = get_layer_type(i_node['layer'])
 
             if layer_type == 'Conv':
@@ -53,24 +53,12 @@ class Pruner(object):
                 prune_idx = self.pruning_method.get_prune_idx(weights=weight_copy, 
                                                         pruning_ratio=group_to_ratio[i_node['group']])
                 
-                total_channel = i_node['layer'].out_channels
-                remaining_channel = total_channel - len(prune_idx)
                 i_node['prune_idx'] = prune_idx
+            
 
-                pruning_info.append(f'layer index: {idx:4d} \t total channel: {total_channel:4d} \t remaining channel: {remaining_channel:4d}')
-            elif layer_type == 'BN':
-                down_key = 1
+        return node_graph
 
-                while 'prune_idx' not in self.node_graph[key - down_key]:
-                    down_key += 1
-                
-                i_node['prune_idx'] = self.node_graph[key - down_key]['prune_idx']
-                
-                pruning_info.append(f'layer index: {idx:4d} \t total channel: {total_channel:4d} \t remaining channel: {remaining_channel:4d}')
-        
-        return pruning_info
-
-    def prune(self):
+    def prune(self, node_graph):
         
             
         group_to_ratio = load_strategy(strategy_name=self.pruning_cfg.STRATEGY,
@@ -78,24 +66,27 @@ class Pruner(object):
                                     pruning_ratio=self.pruning_cfg.STRATEGY_ARGS.PRUNING_RATIO
                                     ).build()
 
-
-        pruning_info = self.set_prune_idx(group_to_ratio)
+        node_graph = self.set_prune_idx(group_to_ratio, node_graph)
 
         new_model = copy.deepcopy(self.model)
 
         i = 0
-        for idx, layer in enumerate(new_model.modules()):
+        pruning_info = []
+        for idx, data in enumerate(new_model.named_modules()):
+            name, layer = data
+
             if idx == 0 or _exclude_layer(layer):
                 continue
             
             layer_type = get_layer_type(layer)
 
             if layer_type == 'Conv':
+
                 prev_prune_idx = []
-                if 'input_convs' in self.node_graph[i]:
-                    prev_prune_idx = self.get_prev_prune_idx(in_layer=self.node_graph[i]['input_convs'],
-                                                            node_graph=self.node_graph)
-                prune_idx = self.node_graph[i]['prune_idx']
+                if 'input_convs' in node_graph[i]:
+                    prev_prune_idx = self.get_prev_prune_idx(in_layer=node_graph[i]['input_convs'],
+                                                            node_graph=node_graph)
+                prune_idx = node_graph[i]['prune_idx']
 
                 keep_prev_idx = list(set(range(layer.in_channels)) - set(prev_prune_idx))
                 keep_idx = list(set(range(layer.out_channels)) - set(prune_idx))
@@ -103,10 +94,35 @@ class Pruner(object):
                 w = layer.weight.data[:, keep_prev_idx, :, :].clone()
                 layer.weight.data = w[keep_idx, :, :, :].clone()
                 if layer.bias is not None:
-                        layer.bias = nn.Parameter(layer.bias.data.clone()[keep_idx])
+                        layer.bias.data = layer.bias.data[keep_idx].clone()
                 
+                remaining_channel = layer.out_channels - len(prune_idx)                
+                
+                pruning_info.append(f'Out channels are pruned: [{layer.out_channels:4d}] -> [{remaining_channel:4d}] at "{name}" layer')
+                layer.out_channels = remaining_channel
+
+            elif layer_type == 'GroupConv':
+
+                prune_idx = self.get_prev_prune_idx(in_layer=node_graph[i]['input_convs'],
+                                                    node_graph=node_graph)
+                
+                keep_idx = list(set(range(layer.out_channels)) - set(prune_idx))
+
+                layer.weight.data = layer.weight.data[keep_idx, keep_idx, :, :].clone()
+                if layer.bias is not None:
+                    layer.bias.data = layer.bias.data[keep_idx].clone()
+
+                remaining_channel = layer.out_channels - len(prune_idx)                
+                pruning_info.append(f'Out channels are pruned: [{layer.out_channels:4d}] -> [{remaining_channel:4d}] at "{name}" layer')
+                layer.out_channels = remaining_channel
+                layer.in_channels = layer.in_channels-len(prune_idx)
+                layer.groups = layer.groups-len(prune_idx)
+
             elif layer_type == 'BN':
-                prune_idx = self.node_graph[i]['prune_idx']
+                
+                prune_idx = self.get_prev_prune_idx(in_layer=node_graph[i]['input_convs'],
+                                                    node_graph=node_graph)
+                
                 keep_idx = list(set(range(layer.num_features)) - set(prune_idx))
 
                 layer.running_mean.data = layer.running_mean.data[keep_idx].clone()
@@ -115,17 +131,23 @@ class Pruner(object):
                     layer.weight.data = layer.weight.data[keep_idx].clone()
                     layer.bias.data = layer.bias.data[keep_idx].clone()
 
-            elif layer_type == 'Linear':
-                if 'input_convs' in self.node_graph[i]:
+                remaining_channel = layer.num_features - len(prune_idx)
+                
+                pruning_info.append(f'Out channels are pruned: [{layer.num_features:4d}] -> [{remaining_channel:4d}] at "{name}" layer')
+                layer.num_features = remaining_channel
 
-                    prev_prune_idx = self.get_prev_prune_idx(in_layer=self.node_graph[i]['input_convs'],
-                                                            node_graph=self.node_graph)
+            elif layer_type == 'Linear':
+                if 'input_convs' in node_graph[i]:
+
+                    prev_prune_idx = self.get_prev_prune_idx(in_layer=node_graph[i]['input_convs'],
+                                                            node_graph=node_graph)
                     keep_idx = list(set(range(layer.in_features)) - set(prev_prune_idx))
                     layer.weight.data = layer.weight.data[:, keep_idx].clone()
             
             i += 1
 
-        return new_model, pruning_info
+        return new_model, pruning_info, node_graph
+
 
     def get_prev_prune_idx(self, in_layer, node_graph):
         if in_layer == None:
@@ -140,14 +162,12 @@ class Pruner(object):
                 prev_prune_idx.update(node_graph[key]['prune_idx'])
                 tmp_in_layer.remove(node_graph[key]['name'])
             
-            
             if len(tmp_in_layer) == 0:
                 num_prev_prune = len(node_graph[key]['prune_idx'])
                 break
 
         indices = random.sample(list(range(len(prev_prune_idx))), k=len(prev_prune_idx)-num_prev_prune)
         prev_prune_idx = list(prev_prune_idx)
-        
         for i in sorted(indices, reverse=True):
             del prev_prune_idx[i]
             
@@ -158,19 +178,27 @@ class Pruner(object):
 
         best_model = {'acc': -1., 'model': None, 'idx': -1}
         for idx in range(self.pruning_method.num_candidates):
-
-            new_model, pruning_info = self.prune()
+            node_graph = copy.deepcopy(self.node_graph)
+            new_model, pruning_info, node_graph = self.prune(node_graph)
 
             best_model = self.pruning_method.get_model(pruned_model=new_model,
                                                     pruning_info=pruning_info,
+                                                    node_graph=node_graph,
                                                     best_model=best_model,
                                                     train_loader=self.train_loader,
                                                     device=self.device,
                                                     idx=idx)
 
         if idx >= 2:
-            logger.info(f'The best candidate is {best_model["index"]}-th prunned model (Train Acc: {best_model["acc"]})')
+            logger.info(f'The best candidate is {best_model["index"]}-th prunned model (Train Acc: {best_model["acc"]})\n')
 
         [logger.info(line) for line in best_model['pruning_info']]
+        logger.info(" ")
+
+        self.best_node_graph = best_model['node_graph']
         
         return best_model['model']
+
+
+    def get_pruning_node_info(self):
+        return self.best_node_graph
