@@ -13,7 +13,7 @@ def get_parser():
     parser = argparse.ArgumentParser(description="NET2net for builtin configs")
     parser.add_argument(
         "--train_config_file",
-        default="configs/train/cifar10_vgg16_bn.yaml",
+        default="configs/train/cifar10/cifar10_vgg16_bn.yaml",
         metavar="FILE",
         help="path to train config file",
     )
