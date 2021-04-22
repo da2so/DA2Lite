@@ -15,9 +15,7 @@ class CriteriaBase(ABC):
 
     
     def get_model(self, pruned_model, pruining_ratio, node_graph, best_model, train_loader, device, **kwargs):
-
-        pruned_model.to(device)
-        
+        pruned_model.to(device) 
         pruned_model.eval()
 
         total_correct = 0            

@@ -56,7 +56,7 @@ class TrainerBase(ABC):
         return size
 
     def model_summary(self, test_acc, test_loss, model):
-
+        model = copy.deepcopy(model)
         macs, params = get_model_complexity_info(model=model,
                                                 input_res=tuple(self.img_shape),
                                                 print_per_layer_stat=False,

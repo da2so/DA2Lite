@@ -1,5 +1,5 @@
 DATASET:
-  NAME: cifar10 # Choice of ['cifar10', 'cifar100']
+  NAME: cifar100 # Choice of ['cifar10', 'cifar100']
   IMG_SHAPE: [3, 32, 32] # [Channel, Height, Width] of the dataset
   DATA_AUG: True  # If True, standard data augmentation will be used.
 

@@ -69,7 +69,7 @@ class Classification(TrainerBase):
                 logger.debug(f'Train - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {loss.item()}')
     
 
-    def test(self, epoch):
+    def test(self, epoch, print_log=True):
 
         self.model.eval()
 
@@ -87,14 +87,14 @@ class Classification(TrainerBase):
         avg_loss /= len(self.test_loader.dataset)
         acc = float(total_correct) / len(self.test_loader.dataset)
         
-        if epoch != -1:
+        if epoch != -1 and print_log == True:
             logger.debug(f'Test  - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {avg_loss.data.item()}')
         #else:
         #    logger.info(f'Test Accuracy: {acc}, Loss {avg_loss.data.item()}')
         return acc, avg_loss.data.item()
     
-    def evaluate(self):
-        return self.test(-1)
+    def evaluate(self, print_log=True):
+        return self.test(-1, print_log)
 
 
     def build(self):
@@ -114,9 +114,9 @@ class Classification(TrainerBase):
         torch.save(self.model.state_dict(), self.save_path)
         
         self.model_summary(test_acc, test_loss, self.model)
-
+        
         return self.model
-
+        
     def _print_train_cfg(self):
         split_train_cfg = str(self.train_cfg).split('\n')
         

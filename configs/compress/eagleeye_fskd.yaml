@@ -9,7 +9,7 @@ PRUNING:
   METHOD:
     CRITERIA: EagleEye # Choice of ['EagleEye', 'L1Criteria', 'L2Criteria', 'RandomCriteria']
     CRITERIA_ARGS: 
-      NUM_CANDIDATES: 1 # for EagleEye
+      NUM_CANDIDATES: 3 # for EagleEye
     STRATEGY: MinMaxStrategy # Choice of ['MinMaxStrategy', 'RandomStrategy', 'StaticStrategy']
     STRATEGY_ARGS:
       PRUNING_RATIO: [0.0, 0.7 ] # for MinMaxStrategy

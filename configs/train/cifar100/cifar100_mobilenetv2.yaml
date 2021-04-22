@@ -1,0 +1,29 @@
+DATASET:
+  NAME: cifar100
+  IMG_SHAPE: [3, 32, 32] 
+  DATA_AUG: True
+
+MODEL:
+  NAME: mobilenetv2
+  NUM_CLASSES: 100
+  PRE_TRAINED:
+    IS_USE: False
+    PATH: './saved_models/origin_cifar10_mobilenetv2.pt'
+
+    
+TRAIN:
+  IS_USE: True 
+  OPTIMIZER: sgd
+  OPTIMIZER_ARGS:
+      MOMENTUM : 0.9
+      WEIGHT_DECAY: 5e-4
+  LOSS: categorical_crossentropy 
+  SCHEDULER: cosineannealLR 
+  SCHEDULER_ARGS:
+    T_MAX: 140
+  BATCH_SIZE: 128
+  EPOCHS: 140
+  LR: 0.01
+
+GPU:
+  IS_USE: True

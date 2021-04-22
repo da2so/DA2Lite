@@ -65,7 +65,7 @@ class KnowledgeDistillation(TrainerBase):
         self.new_model = kd_obj.build()  
 
 
-    def test(self, epoch):
+    def test(self, epoch, print_log=True):
 
         self.new_model.eval()
 
@@ -73,9 +73,8 @@ class KnowledgeDistillation(TrainerBase):
         avg_loss = 0.0
         with torch.no_grad():
             for i, (images, labels) in enumerate(self.test_loader):
-                images, labels = Variable(images).to(self.device), Variable(labels).to(self.device)
-                #import numpy as np
-                #print(np.shape(images))
+                images, labels = images.to(self.device), labels.to(self.device)
+
                 outputs = self.new_model(images)
                 avg_loss += self.loss(outputs, labels).sum()
                 pred = outputs.data.max(1)[1]
@@ -85,28 +84,46 @@ class KnowledgeDistillation(TrainerBase):
         avg_loss /= len(self.test_loader.dataset)
         acc = float(total_correct) / len(self.test_loader.dataset)
         
-        if epoch != -1:
-            logger.debug(f'Test  - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {avg_loss.data.item()}')
-        else:
-            logger.info(f'Test Accuracy: {acc}, Loss {avg_loss.data.item()}')
-        
+        if print_log == True:
+            if epoch != -1:
+                logger.debug(f'Test  - Epoch [{epoch}/{self.epochs}] Accuracy: {acc}, Loss: {avg_loss.data.item()}')
+            else:
+                logger.info(f'Test Accuracy: {acc}, Loss {avg_loss.data.item()}')
+            
         return acc, avg_loss.data.item()
     
 
-    def evaluate(self):
-        return self.test(-1)
+    def evaluate(self, print_log=True):
+        return self.test(-1, print_log)
     
     def build(self):
         if self.kd_name == 'fskd':
+            self._print_train_cfg()
             self.train(-1)
             test_acc, test_loss = self.test(-1)
         
         logger.info(f'The trained model is saved in {self.save_path}\n')        
-        torch.save(self.model.state_dict(), self.save_path)
+        torch.save(self.new_model.state_dict(), self.save_path)
         
         self.model_summary(test_acc, test_loss, self.new_model)
 
         return self.new_model
 
 
-    
+    def _print_train_cfg(self):
+        split_train_cfg = str(self.train_cfg).split('\n')
+        
+        num_dummy = 60
+        train_txt = ' Train configuration '.center(num_dummy,' ')
+        border_txt = '-'*num_dummy
+       
+        logger.info(f'+{border_txt}+')
+        logger.info(f'|{train_txt}|')
+        logger.info(f'+{border_txt}+')
+        logger.info(f'|{" ".ljust(num_dummy)}|')
+        for i_tr_cfg in split_train_cfg:
+            if 'IS_USE' in i_tr_cfg:
+                continue
+            logger.info(f'| {i_tr_cfg.ljust(num_dummy-1)}|')
+        logger.info(f'|{" ".ljust(num_dummy)}|')
+        logger.info(f'+{border_txt}+\n')

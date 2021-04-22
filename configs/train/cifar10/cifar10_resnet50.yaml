@@ -5,11 +5,11 @@ DATASET:
 
 
 MODEL:
-  NAME: resnet34
+  NAME: resnet50
   NUM_CLASSES: 10
   PRE_TRAINED:
     IS_USE: False
-    PATH: './cifar10_resnet34.pt'
+    PATH: './saved_models/origin_cifar10_resnet50.pt'
 
     
 TRAIN:
@@ -19,10 +19,9 @@ TRAIN:
       MOMENTUM : 0.9
       WEIGHT_DECAY: 5e-4
   LOSS: categorical_crossentropy 
-  SCHEDULER: stepLR 
+  SCHEDULER: cosineannealLR 
   SCHEDULER_ARGS:
-    STEP_SIZE: 60
-    GAMMA: 0.1
+    T_MAX: 140
   BATCH_SIZE: 128
   EPOCHS: 140
   LR: 0.1

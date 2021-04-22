@@ -1,0 +1,30 @@
+DATASET:
+  NAME: cifar100
+  IMG_SHAPE: [3, 32, 32] 
+  DATA_AUG: True
+
+
+MODEL:
+  NAME: vgg16_bn
+  NUM_CLASSES: 100
+  PRE_TRAINED:
+    IS_USE: False
+    #PATH: './saved_models/origin_cifar10_vgg16_bn.pt'
+    PATH: './saved_models/test_vgg.pt'
+TRAIN:
+  IS_USE: True 
+  OPTIMIZER: sgd
+  OPTIMIZER_ARGS:
+      MOMENTUM : 0.9
+      WEIGHT_DECAY: 5e-4
+  LOSS: categorical_crossentropy 
+  SCHEDULER: stepLR 
+  SCHEDULER_ARGS:
+    STEP_SIZE: 60
+    GAMMA: 0.1
+  BATCH_SIZE: 128
+  EPOCHS: 140
+  LR: 0.1
+
+GPU:
+  IS_USE: True

@@ -29,6 +29,7 @@ def tucker_decomposition(layer, rank, device):
     elif rank == 'VBMF':
         ranks = estimate_ranks(layer)
 
+    print(ranks)
     core, [last, first] = \
         partial_tucker(layer.weight.data.cpu().numpy(),
                         modes=[0, 1],

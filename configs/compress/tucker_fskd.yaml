@@ -1,0 +1,15 @@
+
+FD:
+  POST_TRAIN:
+    IS_USE: True # Use post-train after pruning?
+    NAME: fskd # Choice of ['basic', 'fskd']
+    NUM_SAMPLES: 1000 # for fskd
+    LOSS: categorical_crossentropy # [categorical_crossentropy, kld, mae, mse] are available
+
+
+  
+  METHOD:
+    DECOMPOSITION: Tucker
+    START_IDX: 6
+    RANK: VBMF
+    

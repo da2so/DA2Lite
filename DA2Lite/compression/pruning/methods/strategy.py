@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 import random
 import time
 import numpy as np
-from collections import OrderedDict
-
-
 
 class StragtegyBase(ABC):
     def __init__(self, group_set):
@@ -24,7 +22,6 @@ class StragtegyBase(ABC):
 
 class MinMaxStrategy(StragtegyBase):
     def __init__(self, group_set, pruning_ratio):
-
         super().__init__(group_set)
         
         assert len(pruning_ratio) == 2
@@ -37,7 +34,6 @@ class MinMaxStrategy(StragtegyBase):
 
 class RandomStrategy(StragtegyBase):
     def __init__(self, group_set, pruning_ratio):
-        
         super().__init__(group_set)
 
     def _get_ratio(self):
@@ -46,7 +42,6 @@ class RandomStrategy(StragtegyBase):
 
 class StaticStrategy(StragtegyBase):
     def __init__(self, group_set, pruning_ratio):
-        
         super().__init__(group_set)
 
         assert len(pruning_ratio) == 1

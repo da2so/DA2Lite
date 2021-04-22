@@ -189,7 +189,8 @@ def EVBMF(Y, sigma2=None, H=None):
     .. [2] Nakajima, Shinichi, et al. "Perfect dimensionality recovery by variational Bayesian PCA." Advances in Neural Information Processing Systems. 2012.     
     """   
     L,M = Y.shape #has to be L<=M
-
+    print(L)
+    print(M)
     if H is None:
         H = L
 
@@ -214,11 +215,13 @@ def EVBMF(Y, sigma2=None, H=None):
         upper_bound = (np.sum(s**2)+residual)/(L*M)
         lower_bound = np.max([s[eH_ub+1]**2/(M*xubar), np.mean(s[eH_ub+1:]**2)/M])
 
-        scale = 1.#/lower_bound
+        scale = 1. #/lower_bound
         s = s*np.sqrt(scale)
         residual = residual*scale
         lower_bound = lower_bound*scale
         upper_bound = upper_bound*scale
+        print(lower_bound)
+        print(upper_bound)
 
         sigma2_opt = minimize_scalar(EVBsigma2, args=(L,M,s,residual,xubar), bounds=[lower_bound, upper_bound], method='Bounded')
         sigma2 = sigma2_opt.x

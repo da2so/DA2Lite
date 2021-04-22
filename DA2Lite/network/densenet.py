@@ -6,6 +6,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+class Basicneck(nn.Module):
+    def __init__(self, in_planes, growth_rate):
+        super(Basicneck, self).__init__()
+        self.bn1 = nn.BatchNorm2d(in_planes)
+        self.conv1 = nn.Conv2d(in_planes, growth_rate, kernel_size=3, padding=1, bias=False)
+
+    def forward(self, x):
+        out = self.conv1(F.relu(self.bn1(x)))
+        out = torch.cat([out,x], 1)
+        return out
+
 class Bottleneck(nn.Module):
     def __init__(self, in_planes, growth_rate):
         super(Bottleneck, self).__init__()
@@ -36,6 +47,7 @@ class Transition(nn.Module):
 class DenseNet(nn.Module):
     def __init__(self, block, nblocks, growth_rate=12, reduction=0.5, num_classes=10):
         super(DenseNet, self).__init__()
+        self.num_nblocks = len(nblocks)
         self.growth_rate = growth_rate
 
         num_planes = 2*growth_rate
@@ -56,11 +68,13 @@ class DenseNet(nn.Module):
         self.dense3 = self._make_dense_layers(block, num_planes, nblocks[2])
         num_planes += nblocks[2]*growth_rate
         out_planes = int(math.floor(num_planes*reduction))
-        self.trans3 = Transition(num_planes, out_planes)
-        num_planes = out_planes
+        if self.num_nblocks == 4:
 
-        self.dense4 = self._make_dense_layers(block, num_planes, nblocks[3])
-        num_planes += nblocks[3]*growth_rate
+            self.trans3 = Transition(num_planes, out_planes)
+            num_planes = out_planes
+
+            self.dense4 = self._make_dense_layers(block, num_planes, nblocks[3])
+            num_planes += nblocks[3]*growth_rate
 
         self.bn = nn.BatchNorm2d(num_planes)
         self.linear = nn.Linear(num_planes, num_classes)
@@ -76,24 +90,33 @@ class DenseNet(nn.Module):
         out = self.conv1(x)
         out = self.trans1(self.dense1(out))
         out = self.trans2(self.dense2(out))
-        out = self.trans3(self.dense3(out))
-        out = self.dense4(out)
-        out = F.avg_pool2d(F.relu(self.bn(out)), 4)
+        if self.num_nblocks == 4:
+            out = self.trans3(self.dense3(out))
+            out = self.dense4(out)
+            out = F.avg_pool2d(F.relu(self.bn(out)), 4)
+
+        elif self.num_nblocks == 3:
+            out = self.dense3(out)
+            out = F.avg_pool2d(F.relu(self.bn(out)), 8)
+
         out = out.view(out.size(0), -1)
         out = self.linear(out)
         return out
 
+def densenet40(num_classes):
+    return DenseNet(Basicneck, [12, 12, 12], growth_rate=12, reduction=1.0, num_classes=num_classes)
+
 def densenet121(num_classes):
-    return DenseNet(Bottleneck, [6,12,24,16], growth_rate=32, num_classes=num_classes)
+    return DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_classes=num_classes)
 
 def densenet169(num_classes):
-    return DenseNet(Bottleneck, [6,12,32,32], growth_rate=32, num_classes=num_classes)
+    return DenseNet(Bottleneck, [6, 12, 32, 32], growth_rate=32, num_classes=num_classes)
 
 def densenet201(num_classes):
-    return DenseNet(Bottleneck, [6,12,48,32], growth_rate=32, num_classes=num_classes)
+    return DenseNet(Bottleneck, [6, 12, 48, 32], growth_rate=32, num_classes=num_classes)
 
 def densenet161(num_classes):
-    return DenseNet(Bottleneck, [6,12,36,24], growth_rate=48, num_classes=num_classes)
+    return DenseNet(Bottleneck, [6, 12, 36, 24], growth_rate=48, num_classes=num_classes)
 
 def densenet_cifar(num_classes):
-    return DenseNet(Bottleneck, [6,12,24,16], growth_rate=12, num_classes=num_classes)
+    return DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=12, num_classes=num_classes)

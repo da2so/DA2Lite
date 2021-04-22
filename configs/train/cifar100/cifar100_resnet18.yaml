@@ -1,16 +1,17 @@
 DATASET:
-  NAME: cifar10
+  NAME: cifar100
   IMG_SHAPE: [3, 32, 32] 
   DATA_AUG: True
 
 
 MODEL:
-  NAME: vgg16_bn
-  NUM_CLASSES: 10
+  NAME: resnet18
+  NUM_CLASSES: 100
   PRE_TRAINED:
     IS_USE: False
-    #PATH: './saved_models/origin_cifar10_vgg16_bn.pt'
-    PATH: './saved_models/test_vgg.pt'
+    PATH: './cifar10_resnet18.pt'
+
+    
 TRAIN:
   IS_USE: True 
   OPTIMIZER: sgd

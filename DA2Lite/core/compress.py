@@ -19,20 +19,18 @@ class Compressor(object):
         self.cfg_util = cfg_util
         self.cfg = cfg_util.cfg
         self.compress_step = []
-
         for i_cfg in self.cfg:
             if i_cfg in cfg_to_compress:
                 self.compress_step.append(i_cfg)
+
         self.origin_model = model
         self.train_loader = train_loader
         self.test_loader = test_loader
-
         self.device = device
 
         logger.info(f'Compression Start!\n')
 
     def _get_compressor(self, compress_name):
-        
         try:
             compressor_class = getattr(compression, compress_name)
         except:
@@ -41,14 +39,12 @@ class Compressor(object):
         return compressor_class
     
     def _get_trainer(self, trainer_name):
-        
         if trainer_name == 'basic':
             trainer_class = getattr(trainer, 'Classification')
         else:
             trainer_class = getattr(trainer, 'KnowledgeDistillation')
         
         return trainer_class
-
 
     def build(self):
 
@@ -91,14 +87,10 @@ class Compressor(object):
                                     pruning_node_info=pruning_node_info
                                     )
 
-            test_acc, test_loss = trainer.evaluate()
-            logger.info(f'Test accuracy right after {compress_name}: {round(test_acc*1e2,2)} %\n')
+            test_acc, test_loss = trainer.evaluate(print_log=False)
+            logger.info(f'Test accuracy right after {compress_name}: {test_acc*1e2:.2f} %\n')
 
-            
             compressed_model = trainer.build()
-
-            import sys
-            sys.exit()
 
     def _print_compress_cfg(self, compress_cfg):
         split_compress_cfg = str(compress_cfg).split('\n')

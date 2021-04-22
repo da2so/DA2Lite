@@ -12,21 +12,20 @@ cfg_to_method = {'Tucker': 'tucker_decomposition'}
 
 class FilterDecomposition(object):
     def __init__(self,
-                fd_cfg,
+                compress_cfg,
                 model,
                 device,
                 **kwargs):
         
         self.origin_model = model
         self.device = device
-
-        self.start_idx = fd_cfg.START_IDX
-        self.fd_name = fd_cfg.DECOMPOSITION
-        self.rank = fd_cfg.RANK
-
-    
-    def _get_method(self, method_name):
         
+        # configs for Filter Decomposition (FD)
+        self.start_idx = compress_cfg.START_IDX
+        self.fd_name = compress_cfg.DECOMPOSITION
+        self.rank = compress_cfg.RANK
+
+    def _get_method(self, method_name):
         try:
             method_func = getattr(methods, method_name)
         except:
@@ -34,13 +33,10 @@ class FilterDecomposition(object):
         
         return method_func
 
-                
     def build(self):
-        
         fd_method = self._get_method(cfg_to_method[self.fd_name])
         
         new_model = copy.deepcopy(self.origin_model)
-        
         current_idx = 1
 
         for name, layer in new_model.named_modules():
@@ -50,7 +46,8 @@ class FilterDecomposition(object):
                 continue
 
             if layer_type == 'Conv':
-                if self.start_idx <= current_idx:
+                if self.start_idx <= current_idx and layer.out_channels > layer.in_channels:
+
                     module, last_name = get_module_of_layer(new_model, name)
                     module._modules[str(last_name)], ranks = fd_method(layer, self.rank, self.device)
                     
