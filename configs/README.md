@@ -1,17 +1,17 @@
 
-## Configuration setting
+## Configuration Guide 
 
 There are two configuration folders to operate <span style="color:DodgerBlue">**DA2Lite**</span>. 
 
-The first is a **train** folder that contains .yaml files for train confuration options (e.g. model, dataset, optimizer, loss, ...).  
-And, a configuration file in **compress** folder allows to user select what compressipon methods will be used sequentially. Besides, when after compression a model, you can control post-train configurations using its .yaml file.
+The first is a **train** folder that contains .yaml files for training configuration options (e.g. model, dataset, optimizer, loss, ...).  
+And, a configuration file in **compress** folder allows to user select what compressipon methods will be used sequentially. Besides, when right after compression a model, you can control post-train configurations using its .yaml file.
 
 
 ## Configuration setting
 
 The followings indicate example configurations and available choices of configurations (represented by comments).
 
-### Train configurations (Train/all.yaml)
+### Train configurations (train/all.yaml)
 
 
    ```shell
@@ -56,7 +56,7 @@ The followings indicate example configurations and available choices of configur
    ```
 
 
-### Compression configurations (Compress/all.yaml)
+### Compression configurations (compress/all.yaml)
 
 
    ```shell

@@ -11,9 +11,65 @@
 
 :star: Star us on GitHub — it helps!!
 
+<table>
+  <tbody>
+    <tr align="center" valign="bottom">
+    <td>
+      </td>
+      <td>
+         <img src="docs/img/bar.png"/>
+         <b>Frameworks & Libraries</b>
+         <img src="docs/img/bar.png"/>
+      </td>
+      <td>
+         <img src="docs/img/bar.png"/>
+         <b>Algorithms</b>
+         <img src="docs/img/bar.png"/>
+      </td>
+    </tr>
+    </tr>
+    <tr valign="top">
+    <td align="center" valign="middle">
+    <b>Built-in</b>
+      </td>
+      <td>
+      <ul>
+         <li><b>Supported Framework</b></li>
+            <ul>
+               <li>PyTorch</li>
+            </ul>
+      </ul>
+      <ul>
+        <li><b>Examples</b></li>
+            <ul>
+            </ul>
+      </ul>
+      </td>
+      <td align="left" >
+         <ul>
+            <li><b>Pruning</b></li>
+            <ul>
+               <li><a href='https://arxiv.org/abs/1608.08710'>L1 norm pruning</a></li>
+               <li><a href='https://arxiv.org/abs/1608.08710'>L2 norm pruning</a></li>
+               <li><a href='https://arxiv.org/abs/2007.02491'>EagleEye</a></li>
+            </ul>
+            <li><b>Filter Decomposition</b></li>
+            <ul>
+               <li><a href='https://arxiv.org/abs/1412.6553'>CP decomposition</a></li>
+               <li><a href='https://arxiv.org/abs/1511.06530'>Tucker decomposition</a></li>
+               <li><a href='https://www.jmlr.org/papers/volume14/nakajima13a/nakajima13a.pdf'>VBMF for rank selection</a></li>
+            </ul>
+            <li><b>Knowledge Distillation</b></li>
+            <ul>
+               <li><a href='https://arxiv.org/abs/1812.01839'>FSKD</a></li>
+            </ul>
+         </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Install
-
 
    ```shell
    git clone https://github.com/da2so/DA2Lite.git
@@ -29,6 +85,34 @@ Then, you prepare runtime environment:
 ## Use
 
 
+### Run
+
+`main.py`(**DA2Lite**) runs with two main configurations like as follows:
+
+   ```shell
+   CUDA_VISIBLE_DEVICES=0 python main.py --train_config_file=./configs/train/cifar10/cifar10/vgg16.yaml --compress_config_file=./configs/compress/tucker.yaml
+   ```
+
+The first one is `train_config_file`, which indicates training configurations and the other is `compress_config_file`, which represents compress configurations.
+The details of available configurations are described in [Here](configs).
+
+After you run **DA2Lite** to compress a DNN model, logging and compressed model are saved in `./log` directory.
+
+The following shows the format of saving:
+- YYYY-MM-DD.HH.MM.SS : format of saved directory for an instance.
+   - models
+      - origin_{dataset}_{model}.pt : The original model is saved.
+      - compress_1_{dataset}_{model}.pt : The compressed model is saved.
+      - ...
+   - process.log : The inevitable log is only logged.
+   - specific_process.log : The training procedure log is added with process.log
+
+
+### Example 
+
+- Run the CIFAR10 example with resnet18 using tucker decomposition.
+   - [Here](examples/cifar10/resnet18_tucker/README.md)
+
 
 ### TODO
 
@@ -36,7 +120,7 @@ Then, you prepare runtime environment:
 * [ ] PyTorchMobile conversion
 * [ ] Train a model based on a custom dataset
 * [ ] Rand-augmentation for improving accuracy
-* [ ] Make model zoo
+* [x] Make model zoo
 * [ ] Up-to-date model architectures.
 * [ ] Train a model for object detection (further future...)
 * [ ] Compression methods for object detection (further future...)
