@@ -50,7 +50,6 @@ class TrainerBase(ABC):
     def build(self):
         raise NotImplementedError
 
-
     def _get_file_size(self, file_path):
         size = os.path.getsize(file_path)
         return size

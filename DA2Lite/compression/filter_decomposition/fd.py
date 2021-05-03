@@ -8,7 +8,8 @@ from DA2Lite.core.log import get_logger
 
 logger = get_logger(__name__)
 
-cfg_to_method = {'Tucker': 'tucker_decomposition'}
+cfg_to_method = {'Tucker': 'tucker_decomposition',
+                'CP': 'cp_decomposition'}
 
 class FilterDecomposition(object):
     def __init__(self,
