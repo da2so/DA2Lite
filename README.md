@@ -42,6 +42,7 @@
       <ul>
         <li><b>Examples</b></li>
             <ul>
+            <li><a href='https://github.com/da2so/DA2Lite/tree/main/examples/cifar10/resnet18_tucker'>resnet18_tucker</a></li>
             </ul>
       </ul>
       </td>
@@ -102,7 +103,7 @@ The following shows the format of saving:
 - YYYY-MM-DD.HH.MM.SS : format of saved directory for an instance.
    - models
       - origin_{dataset}_{model}.pt : The original model is saved.
-      - compress_1_{dataset}_{model}.pt : The compressed model is saved.
+      - compress_1_{dataset}_{model}.pt : The first compressed model is saved.
       - ...
    - process.log : The inevitable log is only logged.
    - specific_process.log : The training procedure log is added with process.log

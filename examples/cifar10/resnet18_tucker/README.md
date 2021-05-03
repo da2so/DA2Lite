@@ -1,7 +1,7 @@
 
 ## Get pre-trained resnet18 model
 
-- Download pre-trained [resnet18 model](https://drive.google.com/file/d/1tDy73OOWlO1B0tZJEbq5NkjZLVlfVt6x/view) and save the model in `./saved_models`.
+- Download pre-trained [resnet18 model](https://drive.google.com/file/d/1tDy73OOWlO1B0tZJEbq5NkjZLVlfVt6x/view) and save the model in `./saved_models` directory.
 
 ## Run main.py with tucker decomposition
 
@@ -12,4 +12,4 @@
 
 ## Get results 
 
-- The results are saved in `./log`.
+- The results are saved in `./log` directory..
