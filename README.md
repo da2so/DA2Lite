@@ -71,6 +71,11 @@
   </tbody>
 </table>
 
+<p align="center">
+<img src="docs/img/framework.png" width="800"/>
+</p>
+
+
 ## Install
 
    ```shell
