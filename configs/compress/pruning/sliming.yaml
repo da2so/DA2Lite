@@ -1,6 +1,6 @@
 PRUNING:
   POST_TRAIN:
-    IS_USE: False 
+    IS_USE: True 
     NAME: basic 
     OPTIMIZER: sgd 
     OPTIMIZER_ARGS: 

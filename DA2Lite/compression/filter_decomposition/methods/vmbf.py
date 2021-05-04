@@ -77,7 +77,6 @@ def VBMF(Y, cacb, sigma2=None, H=None):
 
         sigma2_opt = minimize_scalar(VBsigma2, args=(L,M,cacb,s,residual), bounds=[lower_bound, upper_bound], method='Bounded')
         sigma2 = sigma2_opt.x
-        print("Estimated sigma2: ", sigma2)
 
     #Threshold gamma term
     #Formula above (21) from [1]
@@ -189,8 +188,6 @@ def EVBMF(Y, sigma2=None, H=None):
     .. [2] Nakajima, Shinichi, et al. "Perfect dimensionality recovery by variational Bayesian PCA." Advances in Neural Information Processing Systems. 2012.     
     """   
     L,M = Y.shape #has to be L<=M
-    print(L)
-    print(M)
     if H is None:
         H = L
 
@@ -220,8 +217,6 @@ def EVBMF(Y, sigma2=None, H=None):
         residual = residual*scale
         lower_bound = lower_bound*scale
         upper_bound = upper_bound*scale
-        print(lower_bound)
-        print(upper_bound)
 
         sigma2_opt = minimize_scalar(EVBsigma2, args=(L,M,s,residual,xubar), bounds=[lower_bound, upper_bound], method='Bounded')
         sigma2 = sigma2_opt.x

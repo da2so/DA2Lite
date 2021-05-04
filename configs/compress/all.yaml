@@ -7,8 +7,8 @@ PRUNING:
       MOMENTUM: 0.9 #for sgd
       WEIGHT_DECAY: 5e-4 #for sgd
       """
-      BETAS = (0.9, 0.999) for adam
-      EPSILON = 1e-8  for adam
+      BETAS: (0.9, 0.999) for adam
+      EPSILON: 1e-8  for adam
       """
     LOSS: categorical_crossentropy # Choice of [categorical_crossentropy, kld, mae, mse]
     SCHEDULER: cosineannealLR # [stepLR, exponentialLR, cosineannealLR]

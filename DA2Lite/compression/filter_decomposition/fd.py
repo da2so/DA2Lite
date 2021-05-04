@@ -47,7 +47,7 @@ class FilterDecomposition(object):
                 continue
 
             if layer_type == 'Conv':
-                if self.start_idx <= current_idx and layer.out_channels > layer.in_channels:
+                if self.start_idx <= current_idx and layer.out_channels >= layer.in_channels:
 
                     module, last_name = get_module_of_layer(new_model, name)
                     module._modules[str(last_name)], ranks = fd_method(layer, self.rank, self.device)

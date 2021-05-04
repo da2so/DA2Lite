@@ -46,8 +46,10 @@ class Classification(TrainerBase):
         self.model.train()
 
         total_correct = 0
+        batches = 0
         loop = tqdm(enumerate(self.train_loader), total=len(self.train_loader)-1, leave=False)
         for i, (images, labels) in loop:
+            batches += len(labels)
             self.optimizer.zero_grad()
 
             images, labels = Variable(images).to(self.device), Variable(labels).to(self.device)
@@ -61,7 +63,7 @@ class Classification(TrainerBase):
             loss.backward()
             self.optimizer.step()
 
-            acc = float(total_correct) / len(self.train_loader.dataset)
+            acc = float(total_correct) / batches
             loop.set_description(f"Train - Epoch [{epoch}/{self.epochs}]")
             loop.set_postfix(Accuracy=acc, Loss=loss.item())
 
