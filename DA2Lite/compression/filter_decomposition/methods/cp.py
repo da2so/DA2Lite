@@ -26,7 +26,7 @@ def estimate_ranks(layer):
 
     return ranks
 
-def cp_decomposition(layer, rank, layer):
+def cp_decomposition(layer, rank, device):
 
     if isinstance(rank, int):
         ranks = rank

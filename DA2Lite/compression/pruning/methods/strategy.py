@@ -45,7 +45,7 @@ class StaticStrategy(StragtegyBase):
         super().__init__(group_set)
 
         assert len(pruning_ratio) == 1
-        self.pruning_ratio = pruning_ratio
+        self.pruning_ratio = pruning_ratio[0]
     
     def _get_ratio(self):
         return self.pruning_ratio

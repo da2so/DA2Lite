@@ -1,0 +1,21 @@
+PRUNING:
+  POST_TRAIN:
+    IS_USE: False 
+    NAME: basic 
+    OPTIMIZER: sgd 
+    OPTIMIZER_ARGS: 
+      MOMENTUM: 0.9 
+      WEIGHT_DECAY: 5e-4 
+    LOSS: categorical_crossentropy
+    SCHEDULER: cosineannealLR 
+    SCHEDULER_ARGS:
+      T_MAX: 50 
+    BATCH_SIZE: 256 
+    EPOCHS: 50 
+    LR: 0.001 
+
+  METHOD:
+    CRITERIA: Slimming 
+    STRATEGY: StaticStrategy 
+    STRATEGY_ARGS:
+      PRUNING_RATIO: [0.5] 

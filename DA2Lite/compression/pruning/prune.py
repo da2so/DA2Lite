@@ -38,7 +38,8 @@ class Pruner(object):
                                                         ).build()
 
         self.criteria_class = load_criteria(criteria_name=self.pruning_cfg.CRITERIA, 
-                                            criteria_args=self.criteria_args)
+                                            criteria_args=self.criteria_args,
+                                            model=self.model)
 
     def set_prune_idx(self, group_to_ratio, node_graph):
         pruning_info = []
@@ -50,12 +51,13 @@ class Pruner(object):
 
             if layer_type == 'Conv':
                 weight_copy = i_node['layer'].weight.clone()
-                prune_idx = self.criteria_class.get_prune_idx(weights=weight_copy, 
+
+                prune_idx = self.criteria_class.get_prune_idx(i_node=i_node, 
                                                             pruning_ratio=group_to_ratio[i_node['group']])
                 
                 i_node['prune_idx'] = prune_idx
 
-                # For unifying prune indexes
+                # For integrating prune indexes
                 if i_node['group'] not in group_frequency:
                     group_frequency[i_node['group']] = [key]
                 else:
@@ -81,17 +83,19 @@ class Pruner(object):
                 for key in group_frequency[group_num]:
                     total_prune_idx.extend(node_graph[key]['prune_idx'])
                 
-                count_prune_idx = Counter(total_prune_idx)
+                limit_num_idx = len(node_graph[key]['prune_idx'])
+                count_prune_idx = dict(Counter(total_prune_idx).most_common(limit_num_idx))
                 cutted_prune_idx = []
+                
                 # only prune filters if prune indexes of layers are duplicated
                 for prune_idx, num in count_prune_idx.items():
                     if num >= 2:
                         cutted_prune_idx.append(prune_idx)
-                
+
                 # redefine prune indexes for same groups
                 for key in group_frequency[group_num]:
                     node_graph[key]['prune_idx'] = cutted_prune_idx
-                        
+   
         return node_graph
                 
     def prune(self, node_graph):

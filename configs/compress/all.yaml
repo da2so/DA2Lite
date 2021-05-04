@@ -25,7 +25,7 @@ PRUNING:
     LR: 0.001 # Learning rate
   
   METHOD:
-    CRITERIA: EagleEye # Choice of ['EagleEye', 'L1Criteria', 'L2Criteria', 'RandomCriteria']
+    CRITERIA: EagleEye # Choice of ['EagleEye', 'Slimming', 'L1Criteria', 'L2Criteria', 'RandomCriteria']
     CRITERIA_ARGS: 
       NUM_CANDIDATES: 20 # for EagleEye
     STRATEGY: MinMaxStrategy # Choice of ['MinMaxStrategy', 'RandomStrategy', 'StaticStrategy']
@@ -34,7 +34,7 @@ PRUNING:
       """
       PRUNING_RATIO: None # for RandomStrategy
 
-      PRUNING_RATIO: 0.5 # for StaticStrategy
+      PRUNING_RATIO: [0.5] # for StaticStrategy
       """
 
 FD:
@@ -54,7 +54,7 @@ FD:
     LR: 0.001
   
   METHOD:
-    DECOMPOSITION: Tucker # Choice of ['Tucker']
+    DECOMPOSITION: Tucker # Choice of ['Tucker', 'CP']
     START_IDX: 6 # Start index of filter decomposition (based on an order of conv layer)
     RANK: 6 # Choice of ['4', '5', '6', 'VBMF']
 

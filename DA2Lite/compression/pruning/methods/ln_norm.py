@@ -9,7 +9,9 @@ class LNCriteria(CriteriaBase):
     def __init__(self, p):
         self.p = p
 
-    def get_prune_idx(self, weights, pruning_ratio=0.0):
+    def get_prune_idx(self, i_node, pruning_ratio=0.0):
+        weights = i_node['layer'].weight.clone()
+        
         if pruning_ratio <= 0: return []
         n = len(weights)
 

@@ -5,16 +5,14 @@ import torch
 
 
 class CriteriaBase(ABC):
+    num_candidates = 1 
 
-    def __init__(self, **kwargs):
-        self.num_candidates = 1 
-    
     @abstractclassmethod
-    def get_prune_idx(self, weights, pruning_ratio=0.0):
+    def get_prune_idx(self, i_node, pruning_ratio=0.0):
         raise NotImplementedError
 
     
-    def get_model(self, pruned_model, pruining_ratio, node_graph, best_model, train_loader, device, **kwargs):
+    def get_model(self, pruned_model, pruning_info, node_graph, best_model, train_loader, device, **kwargs):
         pruned_model.to(device) 
         pruned_model.eval()
 

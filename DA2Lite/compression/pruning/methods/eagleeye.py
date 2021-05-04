@@ -13,8 +13,9 @@ class EagleEye(CriteriaBase):
         
         self.num_candidates = criteria_args.NUM_CANDIDATES
         
-    def get_prune_idx(self, weights, pruning_ratio=0.0):
-        indices = L1Criteria().get_prune_idx(weights, pruning_ratio)
+    def get_prune_idx(self, i_node, pruning_ratio=0.0):
+        
+        indices = L1Criteria().get_prune_idx(i_node, pruning_ratio)
         return indices
 
     def get_model(self, pruned_model, pruning_info, node_graph, best_model, train_loader, device, **kwargs):

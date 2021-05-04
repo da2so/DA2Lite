@@ -33,10 +33,10 @@ class GraphGenerator(object):
     def _get_layer_info(self, torch_model):
         layer_info = OrderedDict()
         i = 0 
-        for idx, layer in enumerate(torch_model.modules()):
+        for idx, (name, layer) in enumerate(torch_model.named_modules()):
             if idx == 0 or _exclude_layer(layer):
                 continue
-            layer_info[i] = {'layer': layer}
+            layer_info[i] = {'layer': layer, 'id': hash(name)}
             i += 1
 
         return layer_info            
