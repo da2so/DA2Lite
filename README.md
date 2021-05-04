@@ -53,6 +53,7 @@
                <li><a href='https://arxiv.org/abs/1608.08710'>L1 norm pruning</a></li>
                <li><a href='https://arxiv.org/abs/1608.08710'>L2 norm pruning</a></li>
                <li><a href='https://arxiv.org/abs/2007.02491'>EagleEye</a></li>
+               <li><a href='https://arxiv.org/abs/1708.06519'>Slimming</a></li>
             </ul>
             <li><b>Filter Decomposition</b></li>
             <ul>
