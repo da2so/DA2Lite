@@ -30,6 +30,7 @@ class Classification(TrainerBase):
         self.model = model.to(device)
         self.train_cfg = train_cfg
         self.is_train = train_cfg.IS_USE
+        cfg_util.train_config = train_cfg#change to train config of compression
 
         self.epochs = train_cfg.EPOCHS
         self.optimizer = cfg_util.get_optimizer(self.model)
@@ -41,18 +42,20 @@ class Classification(TrainerBase):
     
     def train(self, epoch):
 
-        for param in self.model.parameters():
-            param.requires_grad = True
+        #for param in self.model.parameters():
+        #    param.requires_grad = True
         self.model.train()
-
+        print(self.optimizer)
+        print(self.loss)
+        print(self.scheduler)
         total_correct = 0
         batches = 0
         loop = tqdm(enumerate(self.train_loader), total=len(self.train_loader)-1, leave=False)
         for i, (images, labels) in loop:
             batches += len(labels)
-            self.optimizer.zero_grad()
 
             images, labels = Variable(images).to(self.device), Variable(labels).to(self.device)
+            self.optimizer.zero_grad()
 
             outputs = self.model(images)
             loss = self.loss(outputs, labels)
@@ -82,11 +85,11 @@ class Classification(TrainerBase):
                 images, labels = Variable(images).to(self.device), Variable(labels).to(self.device)
 
                 outputs = self.model(images)
-                avg_loss += self.loss(outputs, labels).sum()
+                avg_loss += self.loss(outputs, labels)
                 pred = outputs.data.max(1)[1]
                 total_correct += pred.eq(labels.data.view_as(pred)).sum()
     
-        avg_loss /= len(self.test_loader.dataset)
+        avg_loss /= (i+1)
         acc = float(total_correct) / len(self.test_loader.dataset)
         
         if epoch != -1 and print_log == True:

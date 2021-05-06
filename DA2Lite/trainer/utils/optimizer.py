@@ -8,5 +8,8 @@ def adam(model, lr, cfg_optimizer):
 def sgd(model, lr, cfg_optimizer):
     momentum = cfg_optimizer.MOMENTUM
     weight_decay = cfg_optimizer.WEIGHT_DECAY
+    print(momentum)
+    print(weight_decay)
+    print(type(weight_decay))
     return optim.SGD(params=model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
 
