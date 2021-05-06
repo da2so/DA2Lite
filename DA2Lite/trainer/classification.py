@@ -42,12 +42,9 @@ class Classification(TrainerBase):
     
     def train(self, epoch):
 
-        #for param in self.model.parameters():
-        #    param.requires_grad = True
+        for param in self.model.parameters():
+            param.requires_grad = True
         self.model.train()
-        print(self.optimizer)
-        print(self.loss)
-        print(self.scheduler)
         total_correct = 0
         batches = 0
         loop = tqdm(enumerate(self.train_loader), total=len(self.train_loader)-1, leave=False)

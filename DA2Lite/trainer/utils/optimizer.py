@@ -6,10 +6,8 @@ def adam(model, lr, cfg_optimizer):
     return optim.Adam(params=model.parameters(), lr=lr, betas=betas, epsilon=epsilon)
 
 def sgd(model, lr, cfg_optimizer):
-    momentum = cfg_optimizer.MOMENTUM
-    weight_decay = cfg_optimizer.WEIGHT_DECAY
-    print(momentum)
-    print(weight_decay)
-    print(type(weight_decay))
+    momentum = float(cfg_optimizer.MOMENTUM)
+    weight_decay = float(cfg_optimizer.WEIGHT_DECAY)
+
     return optim.SGD(params=model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
 
