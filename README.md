@@ -11,6 +11,11 @@
 
 :star: Star us on GitHub — it helps!!
 
+<p align="center">
+<img src="docs/img/framework.png" width="700"/>
+</p>
+
+
 <table>
   <tbody>
     <tr align="center" valign="bottom">
@@ -70,6 +75,8 @@
     </tr>
   </tbody>
 </table>
+
+
 
 ## Install
 
