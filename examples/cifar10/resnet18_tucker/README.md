@@ -12,7 +12,7 @@
 The following figure respresents a procedure log of tucker decomposition.
 
 <p align="center">
-<img src="examples/cifar10/resnet18_tucker/imgs/1.PNG" width="700" />
+<img src="imgs/1.PNG" width="700" />
 </p>
 
 ## Get results 
@@ -23,5 +23,7 @@ The following figure respresents a procedure log of tucker decomposition.
    - The below figure shows a fine-tuning procedure right after tucker decomposion.
    
    <p align="center">
-   <img src="examples/cifar10/resnet18_tucker/imgs/2.png" width="700" />
+   <img src="imgs/2.png" width="700" />
    </p>
+
+The result files can download in [Here](https://drive.google.com/file/d/1Qp62zrmtCgCrX9jaBxCEg-ilMdWERivU/view?usp=sharing).
