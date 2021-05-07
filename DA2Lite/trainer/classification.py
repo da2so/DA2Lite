@@ -30,7 +30,7 @@ class Classification(TrainerBase):
         self.model = model.to(device)
         self.train_cfg = train_cfg
         self.is_train = train_cfg.IS_USE
-        cfg_util.train_config = train_cfg#change to train config of compression
+        cfg_util.train_config = train_cfg #change to train config of compression
 
         self.epochs = train_cfg.EPOCHS
         self.optimizer = cfg_util.get_optimizer(self.model)

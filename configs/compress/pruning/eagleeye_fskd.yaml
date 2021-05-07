@@ -1,15 +1,15 @@
 PRUNING:
   POST_TRAIN:
-    IS_USE: True # Use post-train after pruning?
-    NAME: fskd # Choice of ['basic', 'fskd']
-    NUM_SAMPLES: 1000 # for fskd
-    LOSS: categorical_crossentropy # [categorical_crossentropy, kld, mae, mse] are available
+    IS_USE: True 
+    NAME: fskd 
+    NUM_SAMPLES: 1000 
+    LOSS: categorical_crossentropy 
 
   
   METHOD:
-    CRITERIA: EagleEye # Choice of ['EagleEye', 'L1Criteria', 'L2Criteria', 'RandomCriteria']
+    CRITERIA: EagleEye 
     CRITERIA_ARGS: 
-      NUM_CANDIDATES: 3 # for EagleEye
-    STRATEGY: MinMaxStrategy # Choice of ['MinMaxStrategy', 'RandomStrategy', 'StaticStrategy']
+      NUM_CANDIDATES: 3 
+    STRATEGY: MinMaxStrategy 
     STRATEGY_ARGS:
-      PRUNING_RATIO: [0.0, 0.7 ] # for MinMaxStrategy
+      PRUNING_RATIO: [0.0, 0.7]

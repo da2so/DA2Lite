@@ -224,13 +224,10 @@ def EVBMF(Y, sigma2=None, H=None):
     #Threshold gamma term
     threshold = np.sqrt(M*sigma2*(1+tauubar)*(1+alpha/tauubar))
     pos = np.sum(s>threshold)
-    print(s)
-    print(threshold)
-    print(s>threshold)
-    print(pos)
+
     #Formula (15) from [2]
     d = np.multiply(s[:pos]/2, 1-np.divide((L+M)*sigma2, s[:pos]**2) + np.sqrt((1-np.divide((L+M)*sigma2, s[:pos]**2))**2 -4*L*M*sigma2**2/s[:pos]**4) )
-    print(d)
+    
     #Computation of the posterior
     post = {}
     post['ma'] = np.zeros(H) 

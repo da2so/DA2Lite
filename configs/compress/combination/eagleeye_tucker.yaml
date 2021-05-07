@@ -1,0 +1,46 @@
+PRUNING:
+  POST_TRAIN:
+    IS_USE: True 
+    NAME: basic 
+    OPTIMIZER: sgd 
+    OPTIMIZER_ARGS:  
+      MOMENTUM: 0.9 
+      WEIGHT_DECAY: 5e-4
+    LOSS: categorical_crossentropy 
+    SCHEDULER: stepLR 
+    SCHEDULER_ARGS:
+      STEP_SIZE: 10
+      GAMMA: 0.1
+    BATCH_SIZE: 256 
+    EPOCHS: 40 
+    LR: 0.001
+  METHOD:
+    CRITERIA: EagleEye # Choice of ['EagleEye', 'L1Criteria', 'L2Criteria', 'RandomCriteria']
+    CRITERIA_ARGS: 
+      NUM_CANDIDATES: 10 # for EagleEye
+    STRATEGY: MinMaxStrategy # Choice of ['MinMaxStrategy', 'RandomStrategy', 'StaticStrategy']
+    STRATEGY_ARGS:
+      PRUNING_RATIO: [0.1, 0.9] # for MinMaxStrategy
+
+
+FD:
+  POST_TRAIN:
+    IS_USE: True
+    NAME: basic
+    OPTIMIZER: sgd
+    OPTIMIZER_ARGS:
+      MOMENTUM: 0.9
+      WEIGHT_DECAY: 5e-4
+    LOSS: categorical_crossentropy 
+    SCHEDULER: cosineannealLR 
+    SCHEDULER_ARGS:
+      T_MAX: 20
+    BATCH_SIZE: 128
+    EPOCHS: 20
+    LR: 0.001
+  
+  METHOD:
+    DECOMPOSITION: Tucker
+    START_IDX: 6
+    RANK: VBMF
+    

@@ -91,6 +91,8 @@ class Compressor(object):
             logger.info(f'Test accuracy right after {compress_name}: {test_acc*1e2:.2f} %\n')
 
             compressed_model = trainer.build()
+            compress_num += 1
+        logger.info(f'Compression End!\n')
 
     def _print_compress_cfg(self, compress_cfg):
         split_compress_cfg = str(compress_cfg).split('\n')

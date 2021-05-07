@@ -34,6 +34,7 @@ class KnowledgeDistillation(TrainerBase):
 
         self.train_cfg = train_cfg
         self.loss = cfg_util.get_loss()
+        cfg_util.train_config = train_cfg #change to train config of compression
 
         self.kd_name = train_cfg.NAME
         self.compress_name = kwargs['compress_name']

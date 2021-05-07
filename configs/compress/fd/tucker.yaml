@@ -7,12 +7,12 @@ FD:
     OPTIMIZER_ARGS:
       MOMENTUM: 0.9
       WEIGHT_DECAY: 5e-4
-    LOSS: categorical_crossentropy # [categorical_crossentropy, kld, mae, mse] are available
-    SCHEDULER: cosineannealLR # [stepLR, cosineannealLR, exponentialLR]
+    LOSS: categorical_crossentropy 
+    SCHEDULER: cosineannealLR
     SCHEDULER_ARGS:
-      T_MAX: 50
+      T_MAX: 20
     BATCH_SIZE: 128
-    EPOCHS: 50
+    EPOCHS: 20
     LR: 0.001
   
   METHOD:
