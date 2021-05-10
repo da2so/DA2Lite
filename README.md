@@ -12,7 +12,7 @@
 :star: Star us on GitHub — it helps!!
 
 <p align="center">
-<img src="docs/img/framework.png" width="700"/>
+<img src="docs/img/framework.png" width="700" />
 </p>
 
 
@@ -120,7 +120,16 @@ The following shows the format of saving:
 ### Example 
 
 - Run the CIFAR10 example with resnet18 using tucker decomposition.
-   - [Here](examples/cifar10/resnet18_tucker/README.md)
+   - The pretrained-model are decomposed and right after fine-tuned: [Here](examples/cifar10/resnet18_tucker/README.md)
+
+
+### Result
+
+#### Cifar10 dataset
+
+|Model|Acc(%)|Param num(M)|MACs(G)|File size(MB)|Download|
+|-----|------|------------|-------|-------------|--------|
+|ResNet18|94.74 -> 94.14 (-0.6) |11.17 -> 0.75 (14.81x)|0.56 -> 0.19 (2.96x)|42.70 -> 2.96 (14.44x)|[C_resnet18](https://drive.google.com/file/d/1YlzYwUKD30N3yUqjUQ2dgSUOGolUKrTd/view?usp=sharing)|
 
 
 ### TODO
@@ -128,11 +137,11 @@ The following shows the format of saving:
 * [ ] Multi-GPU training
 * [ ] PyTorchMobile conversion
 * [ ] Train a model based on a custom dataset
-* [ ] Rand-augmentation for improving accuracy
-* [x] Make model zoo
+* [ ] Rand-augmentation for improving an accuracy
+* [x] Make a model zoo
 * [ ] Up-to-date model architectures.
-* [ ] Train a model for object detection (further future...)
-* [ ] Compression methods for object detection (further future...)
+* [ ] Train a model for object detection tasks (further future...)
+* [ ] Compression methods for object detection tasks (further future...)
 
 ## License
 
