@@ -1,0 +1,23 @@
+PRUNING:
+  POST_TRAIN:
+    IS_USE: True 
+    NAME: basic 
+    OPTIMIZER: sgd 
+    OPTIMIZER_ARGS: 
+      MOMENTUM: 0.9 
+      WEIGHT_DECAY: 5e-4 
+    LOSS: categorical_crossentropy
+    SCHEDULER: cosineannealLR 
+    SCHEDULER_ARGS:
+      T_MAX: 100
+    BATCH_SIZE: 128 
+    EPOCHS: 100 
+    LR: 0.01 
+
+  METHOD:
+    CRITERIA: NuclearNorm 
+    CRITERIA_ARGS: 
+      NUM_SAMPLES: 100
+    STRATEGY: StaticStrategy 
+    STRATEGY_ARGS:
+      PRUNING_RATIO: [0.5] 

@@ -10,9 +10,9 @@ FD:
     LOSS: categorical_crossentropy 
     SCHEDULER: cosineannealLR
     SCHEDULER_ARGS:
-      T_MAX: 20
+      T_MAX: 15
     BATCH_SIZE: 128
-    EPOCHS: 20
+    EPOCHS: 15
     LR: 0.001
   
   METHOD:

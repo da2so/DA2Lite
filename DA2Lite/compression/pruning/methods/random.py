@@ -5,7 +5,9 @@ import torch
 from DA2Lite.compression.pruning.methods.criteria_base import CriteriaBase
 
 class RandomCriteria(CriteriaBase):
-
+    def __init__(self, **kwargs):
+        pass
+        
     def get_prune_idx(self, i_node, pruning_ratio=0.0): 
         weights = i_node['layer'].weight.clone()
 

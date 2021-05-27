@@ -50,7 +50,6 @@ class Wide_ResNet(nn.Module):
         n = (depth-4)/6
         k = widen_factor
 
-        print('| Wide-Resnet %dx%d' %(depth, k))
         nStages = [16, 16*k, 32*k, 64*k]
 
         self.conv1 = conv3x3(3,nStages[0])
@@ -82,15 +81,22 @@ class Wide_ResNet(nn.Module):
 
         return out
 
+def wide_resnet16x1(num_classes):
+    depth = 16
+    kernel = 1
+    return Wide_ResNet(depth, kernel, 0.0, num_classes)
 
-def wide_resnet28x10(num_classes):
-    return Wide_ResNet(depth=28, widen_factor=10, dropout_rate=0.3, num_classes=num_classes)
+def wide_resnet16x2(num_classes):
+    depth = 16
+    kernel = 2
+    return Wide_ResNet(depth, kernel, 0.0, num_classes)
 
-def wide_resnet28x20(num_classes):
-    return Wide_ResNet(depth=28, widen_factor=20, dropout_rate=0.3, num_classes=num_classes)
+def wide_resnet40x1(num_classes):
+    depth = 40
+    kernel = 1
+    return Wide_ResNet(depth, kernel, 0.0, num_classes)
 
-def wide_resnet40x10(num_classes):
-    return Wide_ResNet(depth=40, widen_factor=10, dropout_rate=0.3, num_classes=num_classes)
-
-def wide_resnet40x20(num_classes):
-    return Wide_ResNet(depth=40, widen_factor=20, dropout_rate=0.3, num_classes=num_classes)
+def wide_resnet40x2(num_classes):
+    depth = 40
+    kernel = 2
+    return Wide_ResNet(depth, kernel, 0.0, num_classes)

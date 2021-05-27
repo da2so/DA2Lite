@@ -4,6 +4,10 @@ import random
 import time
 import numpy as np
 
+
+#vgg_16_bn = [0.4] + [0.5] + [0.6] + [0.5] + [0.7] + [0.6]*2 + [0.8]*3 + [0.9]*3
+vgg_16_bn = [0.3] + [0.4] + [0.5] + [0.6] + [0.6] + [0.7]*2 + [0.7]*3 + [0.7]*3
+
 class StragtegyBase(ABC):
     def __init__(self, group_set):
         self.group_set = group_set
@@ -11,10 +15,11 @@ class StragtegyBase(ABC):
 
     def build(self):
         group_to_ratio = OrderedDict()
-        for i_group in self.group_set:
+        for idx, i_group in enumerate(self.group_set):
             random_rate = self._get_ratio()
-            group_to_ratio[i_group] = random_rate
-        
+            group_to_ratio[i_group] = vgg_16_bn[idx]
+
+
         return group_to_ratio
     
     def _get_ratio(self):

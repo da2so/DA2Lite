@@ -27,6 +27,11 @@ class Classification(TrainerBase):
                         train_loader,
                         test_loader,
                         device)
+
+        self.origin_summary = None
+        if 'origin_summary' in kwargs:
+            self.origin_summary = kwargs['origin_summary']
+        
         self.model = model.to(device)
         self.train_cfg = train_cfg
         self.is_train = train_cfg.IS_USE
@@ -79,7 +84,7 @@ class Classification(TrainerBase):
         avg_loss = 0.0
         with torch.no_grad():
             for i, (images, labels) in enumerate(self.test_loader):
-                images, labels = Variable(images).to(self.device), Variable(labels).to(self.device)
+                images, labels = images.to(self.device), labels.to(self.device)
 
                 outputs = self.model(images)
                 avg_loss += self.loss(outputs, labels)
@@ -113,11 +118,11 @@ class Classification(TrainerBase):
         else:
             test_acc, test_loss = self.evaluate()
         logger.info(f'The trained model is saved in {self.save_path}\n')        
-        torch.save(self.model.state_dict(), self.save_path)
+        torch.save(self.model, self.save_path)
         
-        self.model_summary(test_acc, test_loss, self.model)
+        summary_dict = self.model_summary(test_acc, test_loss, self.model, self.origin_summary)
         
-        return self.model
+        return self.model, summary_dict
         
     def _print_train_cfg(self):
         split_train_cfg = str(self.train_cfg).split('\n')

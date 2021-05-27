@@ -1,4 +1,6 @@
-
+"""
+DenseNet: https://arxiv.org/abs/1608.06993
+"""
 import math
 
 import torch

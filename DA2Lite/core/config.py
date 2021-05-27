@@ -74,7 +74,7 @@ class CfgUtil():
             return model_arch
 
         if model_cfg.PRE_TRAINED.IS_USE:
-            if torch.typename(torch.load(model_cfg.PRE_TRAINED.PATH)) == 'OrderedDict':
+            if torch.typename(torch.load(model_cfg.PRE_TRAINED.PATH,  map_location=self.get_device())) == 'OrderedDict':
 
                 """
                 if you want to use customized model that has a type 'OrderedDict',
@@ -89,7 +89,7 @@ class CfgUtil():
                 except:
                     raise ValueError(f'An invalid model was loaded.')
             else:
-                model = torch.load(model_cfg.PRE_TRAINED.PATH)
+                model = torch.load(model_cfg.PRE_TRAINED.PATH, map_location=self.get_device())
         else:
             model = get_model_arch()
         return model

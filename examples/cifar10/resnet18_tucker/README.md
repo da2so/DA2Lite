@@ -2,6 +2,7 @@
 ## Get pre-trained resnet18 model
 
 - Download pre-trained [resnet18 model](https://drive.google.com/file/d/1tDy73OOWlO1B0tZJEbq5NkjZLVlfVt6x/view) and save the model in `./saved_models` directory.
+   - You should make `./saved_models` directory.
 
 ## Run main.py with tucker decomposition
 
@@ -26,4 +27,4 @@ The following figure respresents a procedure log of tucker decomposition.
    <img src="imgs/2.png" width="700" />
    </p>
 
-The result files can download in [Here](https://drive.google.com/file/d/1Qp62zrmtCgCrX9jaBxCEg-ilMdWERivU/view?usp=sharing).
+The result files can download in [Here](https://drive.google.com/file/d/1M2azkTqapPaciVZwIhischEg9hJXd66g/view?usp=sharing).

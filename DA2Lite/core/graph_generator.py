@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import time
+import copy
 from collections import OrderedDict
 
 import onnx
@@ -8,7 +9,7 @@ import torch.nn as nn
 import torch
 from torchsummary import summary
 
-from DA2Lite.core.layer_utils import _exclude_layer, get_layer_type
+from DA2Lite.core.layer_utils import _exclude_layer, get_layer_type, get_module_of_layer
 
 
 class GraphGenerator(object):
@@ -16,17 +17,21 @@ class GraphGenerator(object):
         self.model = model.eval().cpu()
         self.dummy_input = torch.randn(img_shape).unsqueeze_(0) # For onnx model export
         self.onnx_save_path = os.path.join(save_dir, 'test.onnx')
-        
+
     def build(self):
         layer_info = self._get_layer_info(torch_model=self.model)
         
-        onnx_graph = self._get_onnx_graph(torch_model=self.model, 
+        self.model = self._remove_bn_from_model(model=self.model)
+
+        onnx_graph, name_to_node = self._get_onnx_graph(torch_model=self.model, 
                                         dummy_input=self.dummy_input,
                                         save_path=self.onnx_save_path)
+
         parsed_onnx_graph = self._onnx_graph_parser(node_graph=onnx_graph)
         
         node_graph, group_set = self._get_combined_graph(layer_info=layer_info, 
-                                                        onnx_graph=parsed_onnx_graph)
+                                                        onnx_graph=parsed_onnx_graph,
+                                                        name_to_node=name_to_node)
         
         return node_graph, group_set
 
@@ -36,32 +41,50 @@ class GraphGenerator(object):
         for idx, (name, layer) in enumerate(torch_model.named_modules()):
             if idx == 0 or _exclude_layer(layer):
                 continue
-            layer_info[i] = {'layer': layer, 'id': hash(name)}
+            layer_info[i] = {'layer': layer, 'torch_name': name}
             i += 1
-
         return layer_info            
-    
+
+    def _remove_bn_from_model(self, model):
+        """
+        It emoves bn layer from the base model because the weights and 
+        its name of conv-bn layers are conbimed when converting to onnx model 
+        """
+        for name, layer in model.named_modules():
+            layer_type = get_layer_type(layer)
+
+            if _exclude_layer(layer):
+                continue
+
+            if layer_type == 'BN':
+                new_layer = []
+                module, last_name = get_module_of_layer(model, name)
+                module._modules[str(last_name)] = nn.Sequential(*new_layer)
+
+        return model
     def _get_onnx_graph(self, torch_model, dummy_input, save_path):
         """
         It brings connected input layer(s) and saves an operation type and name in each layer.
         """
         node_graph = OrderedDict()
-
+        name_to_node = OrderedDict()
         torch.onnx.export(torch_model, dummy_input, save_path, verbose=False)
         onnx_model = onnx.load(save_path)
-        onnx.checker.check_model(onnx_model)
 
         for i in range(len(onnx_model.graph.node)):
             i_node = onnx_model.graph.node[i]
-
             if 'Conv' == i_node.op_type or 'Gemm' == i_node.op_type: # Gemm indicates linear(fc) layer.
                 node_graph[i_node.output[0]] = {'input': [i_node.input[0]], 'op_type': i_node.op_type, 'name': i_node.name}
+
+                w_idx = i_node.input[1].find('.weight')
+                i_torch_name = i_node.input[1][:w_idx]
+                name_to_node[i_torch_name] = i_node.output[0]
             else:
                 node_graph[i_node.output[0]] = {'input': i_node.input, 'op_type': i_node.op_type, 'name': i_node.name}
 
         os.remove(save_path) # Remove onnx model
 
-        return node_graph
+        return node_graph, name_to_node
         
     def _onnx_graph_parser(self, node_graph):
         """
@@ -181,8 +204,8 @@ class GraphGenerator(object):
         down_key = -1
         concat_op = None
         while 'name' not in layer_info[key + down_key]:
-            down_key -= -1
-        
+            down_key -= 1
+
         if layer_info[key + down_key]['layer'].out_channels != key_out_channels: # If bn - conv order, not conv - bn order
             up_key = 1 
             while 'name' not in layer_info[key + up_key]:
@@ -195,25 +218,20 @@ class GraphGenerator(object):
         else:
             if 'concat_op' in layer_info[key + down_key]:
                 concat_op = layer_info[key + down_key]['concat_op']
-
             return [layer_info[key + down_key]['name']], concat_op
 
-    def _get_combined_graph(self, layer_info, onnx_graph):
+    def _get_combined_graph(self, layer_info, onnx_graph, name_to_node):
         """
         It combines onnx and pytorch node graphs
         """
-        is_first_linear = True
         group_set = set()
 
         for key in layer_info.keys():
             layer_type = get_layer_type(layer_info[key]['layer'])
+            keras_name = layer_info[key]['torch_name']
+            if layer_type == 'Conv' or layer_type == 'GroupConv' or layer_type == 'Linear':
+                i_graph = onnx_graph[name_to_node[keras_name]]
 
-            if layer_type == 'Conv' or layer_type == 'GroupConv':
-                assert 'group' in onnx_graph[next(iter(onnx_graph))]
-
-                i_graph = onnx_graph[next(iter(onnx_graph))]
-
-                layer_info[key]['group'] = i_graph['group']
                 layer_info[key]['name'] = i_graph['name']
                 if 'input_convs' in i_graph:
                     layer_info[key]['input_convs'] = i_graph['input_convs']
@@ -221,23 +239,10 @@ class GraphGenerator(object):
                     layer_info[key]['input_convs'] = None
                 if 'concat_op' in i_graph:
                     layer_info[key]['concat_op'] = i_graph['concat_op']
-
-                group_set.add(i_graph['group'])
-                del onnx_graph[next(iter(onnx_graph))]
-            
-            elif layer_type == 'Linear':
-                assert 'group' in onnx_graph[next(iter(onnx_graph))]
-
-                i_graph = onnx_graph[next(iter(onnx_graph))]
-                layer_info[key]['name'] = i_graph['name']
-                if 'input_convs' in i_graph:
-                    layer_info[key]['input_convs'] = i_graph['input_convs']
-                else:
-                    layer_info[key]['input_convs'] = None
-                if 'concat_op' in i_graph:
-                    layer_info[key]['concat_op'] = i_graph['concat_op']
-                del onnx_graph[next(iter(onnx_graph))]
-
+                
+                if layer_type == 'Conv' or layer_type == 'GroupConv':
+                    layer_info[key]['group'] = i_graph['group'] 
+                    group_set.add(i_graph['group'])
             else:
                 continue
         

@@ -1,0 +1,28 @@
+DATASET:
+  NAME: cifar10
+  IMG_SHAPE: [3, 32, 32] 
+  DATA_AUG: True
+
+MODEL:
+  NAME: preact_resnet18
+  NUM_CLASSES: 10
+  PRE_TRAINED:
+    IS_USE: True
+    PATH: './saved_models/origin_cifar10_preact_resnet18.pt'
+  
+TRAIN:
+  IS_USE: False 
+  OPTIMIZER: sgd
+  OPTIMIZER_ARGS:
+      MOMENTUM : 0.9
+      WEIGHT_DECAY: 5e-4
+  LOSS: categorical_crossentropy 
+  SCHEDULER: cosineannealLR 
+  SCHEDULER_ARGS:
+    T_MAX: 150
+  BATCH_SIZE: 128
+  EPOCHS: 150
+  LR: 0.01
+
+GPU:
+  IS_USE: True

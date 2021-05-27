@@ -42,13 +42,17 @@ def _exclude_layer(layer):
 
 
 def get_layer_type(layer):
-    
+
     if isinstance(layer, nn.modules.conv.Conv2d) and layer.groups <= 1:
         return 'Conv'
     elif isinstance(layer, nn.modules.conv.Conv2d) and layer.groups > 1:
         return 'GroupConv'
     elif isinstance(layer, nn.modules.batchnorm.BatchNorm2d):
         return 'BN'
+    elif isinstance(layer, nn.modules.pooling.MaxPool2d):
+        return 'MaxPool'
+    elif isinstance(layer, nn.modules.pooling.AvgPool2d):
+        return 'AvgPool'
     elif isinstance(layer, nn.modules.linear.Linear):
         return 'Linear'
     

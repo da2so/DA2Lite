@@ -1,11 +1,11 @@
 DATASET:
-  NAME: cifar100 # Choice of ['cifar10', 'cifar100']
+  NAME: cifar10 # Choice of ['cifar10', 'cifar100']
   IMG_SHAPE: [3, 32, 32] # [Channel, Height, Width] of the dataset
   DATA_AUG: True  # If True, standard data augmentation will be used.
 
 MODEL: 
   NAME: resnet50 # 
-  NUM_CLASSES: 100 # The number of classes 
+  NUM_CLASSES: 10 # The number of classes 
   PRE_TRAINED:
     IS_USE: False # Load your pretrained model???
     PATH: './cifar10_resnet50.pt' # Model path for the pretrained model path

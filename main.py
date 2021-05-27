@@ -48,15 +48,13 @@ if __name__ == '__main__':
                             test_loader=test_loader,
                             device=device)
 
-    trained_model = trainer.build()
+    trained_model, origin_summary = trainer.build()
     
-
-    model = model.cuda()
-
     DA2lite = Compressor(cfg_util=cfg_util,
                         model=model,
                         train_loader=train_loader,
                         test_loader=test_loader,
+                        origin_summary=origin_summary,
                         device=device)
     DA2lite.build()
     

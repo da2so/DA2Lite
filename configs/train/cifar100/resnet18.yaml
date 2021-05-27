@@ -8,12 +8,12 @@ MODEL:
   NAME: resnet18
   NUM_CLASSES: 100
   PRE_TRAINED:
-    IS_USE: False
-    PATH: './cifar10_resnet18.pt'
+    IS_USE: True
+    PATH: './saved_models/origin_cifar100_resnet18.pt'
 
     
 TRAIN:
-  IS_USE: True 
+  IS_USE: False 
   OPTIMIZER: sgd
   OPTIMIZER_ARGS:
       MOMENTUM : 0.9

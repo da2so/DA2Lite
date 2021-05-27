@@ -1,0 +1,22 @@
+
+CLUSTERING:
+  POST_TRAIN:
+    IS_USE: True
+    NAME: basic
+    OPTIMIZER: sgd
+    OPTIMIZER_ARGS:
+      MOMENTUM: 0.9
+      WEIGHT_DECAY: 5e-4
+    LOSS: categorical_crossentropy 
+    SCHEDULER: cosineannealLR
+    SCHEDULER_ARGS:
+      T_MAX: 30
+    BATCH_SIZE: 128
+    EPOCHS: 30
+    LR: 0.001
+  
+  METHOD:
+    CLUSTER: NEW
+    STRATEGY: StaticStrategy
+    STRATEGY_ARGS:
+      CLUSTERING_RATIO: [0.3] 

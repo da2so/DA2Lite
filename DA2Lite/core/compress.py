@@ -6,7 +6,7 @@ from DA2Lite.core.log import get_logger
 
 logger = get_logger(__name__)
 
-cfg_to_compress = {'PRUNING': 'Pruner', 'FD': 'FilterDecomposition'}
+cfg_to_compress = {'PRUNING': 'Pruner', 'FD': 'FilterDecomposition', 'CLUSTERING': 'Clustering'}
 
 class Compressor(object):
     def __init__(self,
@@ -14,6 +14,7 @@ class Compressor(object):
                 model,
                 train_loader,
                 test_loader,
+                origin_summary,
                 device):
         
         self.cfg_util = cfg_util
@@ -23,11 +24,13 @@ class Compressor(object):
             if i_cfg in cfg_to_compress:
                 self.compress_step.append(i_cfg)
 
-        self.origin_model = model
+        self.origin_model = model.to(device)
         self.train_loader = train_loader
         self.test_loader = test_loader
+        
+        self.origin_summary = origin_summary
         self.device = device
-
+        
         logger.info(f'Compression Start!\n')
 
     def _get_compressor(self, compress_name):
@@ -84,13 +87,14 @@ class Compressor(object):
                                     device=self.device,
                                     origin_model=self.origin_model,
                                     compress_name=cfg_to_compress[compress_name],
-                                    pruning_node_info=pruning_node_info
+                                    pruning_node_info=pruning_node_info,
+                                    origin_summary=self.origin_summary
                                     )
 
             test_acc, test_loss = trainer.evaluate(print_log=False)
             logger.info(f'Test accuracy right after {compress_name}: {test_acc*1e2:.2f} %\n')
 
-            compressed_model = trainer.build()
+            compressed_model, compress_summary = trainer.build()
             compress_num += 1
         logger.info(f'Compression End!\n')
 

@@ -10,9 +10,9 @@ FD:
     LOSS: categorical_crossentropy 
     SCHEDULER: cosineannealLR 
     SCHEDULER_ARGS:
-      T_MAX: 20
+      T_MAX: 30
     BATCH_SIZE: 128
-    EPOCHS: 20
+    EPOCHS: 30
     LR: 0.001
   
   METHOD:
@@ -31,19 +31,19 @@ PRUNING:
     LOSS: categorical_crossentropy 
     SCHEDULER: stepLR 
     SCHEDULER_ARGS:
-      STEP_SIZE: 20
+      STEP_SIZE: 30
       GAMMA: 0.1
     BATCH_SIZE: 256 
-    EPOCHS: 60
+    EPOCHS: 80
     LR: 0.01
 
   METHOD:
-    CRITERIA: EagleEye # Choice of ['EagleEye', 'L1Criteria', 'L2Criteria', 'RandomCriteria']
+    CRITERIA: EagleEye 
     CRITERIA_ARGS: 
-      NUM_CANDIDATES: 20 # for EagleEye
-    STRATEGY: MinMaxStrategy # Choice of ['MinMaxStrategy', 'RandomStrategy', 'StaticStrategy']
+      NUM_CANDIDATES: 20 
+    STRATEGY: MinMaxStrategy
     STRATEGY_ARGS:
-      PRUNING_RATIO: [0.0, 0.5] # for MinMaxStrategy
+      PRUNING_RATIO: [0.0, 0.6] 
 
 
     

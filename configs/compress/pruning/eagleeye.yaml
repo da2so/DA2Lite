@@ -9,15 +9,16 @@ PRUNING:
     LOSS: categorical_crossentropy 
     SCHEDULER: stepLR 
     SCHEDULER_ARGS:
-      STEP_SIZE: 10
+      STEP_SIZE: 30
       GAMMA: 0.1
     BATCH_SIZE: 256 
-    EPOCHS: 40 
-    LR: 0.001 
+    EPOCHS: 80 
+    LR: 0.01 
+
   METHOD:
     CRITERIA: EagleEye 
     CRITERIA_ARGS: 
       NUM_CANDIDATES: 10 
     STRATEGY: MinMaxStrategy 
     STRATEGY_ARGS:
-      PRUNING_RATIO: [0.1, 0.9] 
+      PRUNING_RATIO: [0.1, 0.6] 

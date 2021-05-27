@@ -128,7 +128,7 @@ The following shows the format of saving:
 #### Cifar10 dataset
 
 |Model|Acc(%)|Param num(M)|MACs(G)|File size(MB)|Download|
-|-----|:------:|:------------:|:-------:|:-------------:|:--------:|
+|:----:|:------:|:------------:|:-------:|:-------------:|:--------:|
 |ResNet18|94.74% -> 94.14% (-0.6) |11.17M -> 0.75M (14.81x)|0.56G -> 0.19G (2.96x)|42.70MB -> 2.96MB (14.44x)|[Here](https://drive.google.com/file/d/1YlzYwUKD30N3yUqjUQ2dgSUOGolUKrTd/view?usp=sharing)|
 |Vgg16|90.83% -> 88.37% (-2.46) |14.72M -> 0.38M (39.12x)|0.31G -> 0.1G (3.29x)|56.16MB -> 1.45MB (38.71x)|[Here](https://drive.google.com/file/d/1Lw6kOnWrgjeP6Qoee_9-g-9ankdzssCO/view?usp=sharing)|
 |Vgg16_bn|93.22% -> 92.74% (-0.48) |14.73M -> 0.71M (20.7x)|0.31G -> 0.11G (2.93x)|56.25MB -> 2.77MB (20.29x)|[Here](https://drive.google.com/file/d/1AKKmZpoKw_6D2QaR6gOHdycQsWyR4u1a/view?usp=sharing)|
