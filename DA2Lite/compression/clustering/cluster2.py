@@ -41,9 +41,9 @@ class Clustering(object):
                                                         ).build()
         del graph_model
 
-        for key, val in self.node_graph.items():
-            print(key)
-            print(val)
+        # for key, val in self.node_graph.items():
+        #     print(key)
+        #     print(val)
 
             
         self.criteria_class = load_method(method_name=self.clustering_cfg.CLUSTER, 

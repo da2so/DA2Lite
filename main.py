@@ -6,6 +6,7 @@ from DA2Lite.trainer.classification import Classification
 from DA2Lite.core.config import CfgUtil
 from DA2Lite.core.log import setup_logger, get_logger
 from DA2Lite.core.compress import Compressor
+from DA2Lite.converter.converter import Converter
 
 logger = get_logger(__name__)
 
@@ -57,4 +58,6 @@ if __name__ == '__main__':
                         origin_summary=origin_summary,
                         device=device)
     DA2lite.build()
-    
+
+    converter = Converter(model, DA2lite.trainer.save_path[:-3] + "_script.pt\n", (16, 3, 32, 32))
+    converter.to_torchscript()

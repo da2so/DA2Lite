@@ -17,7 +17,7 @@ class New2Clustering(ClusteringBase):
         
         
         B, C, _, _ = f_maps.size()
-        print(f'Channels: {C}')
+        # print(f'Channels: {C}')
         
         f_maps = f_maps.view(B, C, -1)
         # per channel SVD
@@ -36,7 +36,7 @@ class New2Clustering(ClusteringBase):
                     torch.nn.CosineSimilarity(dim=0)(f_hats[i].view(-1), f_hats[j].view(-1))
                 )
                 simmat[i, j] = simmat[j, i] = sim
-        print(simmat)
+        # print(simmat)
         # remove with threshold
 
         
@@ -54,7 +54,7 @@ class New2Clustering(ClusteringBase):
                     simmat[i_col][argmax_row] = 0.0
                     remove_indices.add(i_col)
 
-        print(remove_indices)
+        # print(remove_indices)
         return list(remove_indices)
 
         """
