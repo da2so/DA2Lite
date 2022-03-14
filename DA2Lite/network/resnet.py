@@ -98,6 +98,33 @@ class ResNet(nn.Module):
             return out, feature
 
 
+class ResNet_Imagenet(ResNet):
+    def __init__(self, block, num_blocks, num_classes=10):
+        super().__init__(block, num_blocks, num_classes)
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.maxpool = self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+    def forward(self, x, out_feature=False):
+        x = self.conv1(x)
+
+        x = self.bn1(x)
+        out = F.relu(x)
+        out = self.maxpool(out)
+
+        out = self.layer1(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.layer4(out)
+        out = self.avg_pool(out)
+        feature = torch.flatten(out, 1)
+        out = self.linear(feature)
+        if out_feature == False:
+            return out
+        else:
+            return out, feature
+
+
+# CIFAR model
 def resnet18(num_classes=10):
     return ResNet(BasicBlock, [2, 2, 2, 2], num_classes)
 
@@ -116,3 +143,20 @@ def resnet101(num_classes=10):
 
 def resnet152(num_classes=10):
     return ResNet(Bottleneck, [3, 8, 36, 3], num_classes)
+
+# Imagenet model
+
+def resnet18_imagenet(num_classes=1000):
+    return ResNet_Imagenet(BasicBlock, [2, 2, 2, 2], num_classes)
+
+def resnet34_imagenet(num_classes=1000):
+    return ResNet_Imagenet(BasicBlock, [3, 4, 6, 3], num_classes)
+
+def resnet50_imagenet(num_classes=1000):
+    return ResNet_Imagenet(Bottleneck, [3, 4, 6, 3], num_classes)
+
+def resnet101_imagenet(num_classes=1000):
+    return ResNet_Imagenet(Bottleneck, [3, 4, 23, 3], num_classes)
+
+def resnet152_imagenet(num_classes=1000):
+    return ResNet_Imagenet(Bottleneck, [3, 8, 36, 3], num_classes)

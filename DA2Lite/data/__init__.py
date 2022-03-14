@@ -1,1 +1,1 @@
-from DA2Lite.data.public import mnist, cifar10, cifar100
+from DA2Lite.data.public import mnist, cifar10, cifar100, imagenet
