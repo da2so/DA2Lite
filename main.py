@@ -59,5 +59,5 @@ if __name__ == '__main__':
                         device=device)
     DA2lite.build()
 
-    converter = Converter(model, DA2lite.trainer.save_path[:-3] + "_script.pt\n", (16, 3, 32, 32))
+    converter = Converter(model, DA2lite.trainer.save_path[:-3] + "_script.pt\n", (16, 3, 32, 32))     # TODO 2022.03.14 config 파일에 IMAGE_SHAPE 이용하도록 변경 해야함
     converter.to_torchscript()

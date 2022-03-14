@@ -19,6 +19,8 @@ def get_cfg_defaults():
     
     _C.DATASET = CN()
     _C.DATASET.NAME = 'cifar10'
+    _C.DATASET.ROOT_DIR = './dataset/'
+    _C.DATASET.NUM_WORKERS = 0
     _C.DATASET.IMG_SHAPE = [3, 32, 32]
     _C.DATASET.DATA_AUG = True
 
@@ -74,8 +76,9 @@ class CfgUtil():
             return model_arch
 
         if model_cfg.PRE_TRAINED.IS_USE:
-            if torch.typename(torch.load(model_cfg.PRE_TRAINED.PATH,  map_location=self.get_device())) == 'OrderedDict':
-
+            model = torch.load(model_cfg.PRE_TRAINED.PATH)
+            
+            if torch.typename(model) == 'OrderedDict':
                 """
                 if you want to use customized model that has a type 'OrderedDict',
                 you shoud load model object as follows:
@@ -89,12 +92,12 @@ class CfgUtil():
                 except:
                     raise ValueError(f'An invalid model was loaded.')
             else:
-                model = torch.load(model_cfg.PRE_TRAINED.PATH, map_location=self.get_device())
+                model = model.to(self.get_device())
         else:
             model = get_model_arch()
         return model
 
-    def load_dataset(self, data_dir='./dataset/'):
+    def load_dataset(self):
         dt = self.cfg.DATASET
         bs = self.train_config.BATCH_SIZE
 
@@ -103,10 +106,10 @@ class CfgUtil():
         except:
             raise ValueError(f'Invalid dataset name: {dt.NAME}')
 
-        train_dt, test_dt = dataset_func(dt.DATA_AUG, dt.IMG_SHAPE, data_dir)
+        train_dt, test_dt = dataset_func(dt.DATA_AUG, dt.IMG_SHAPE, dt.ROOT_DIR)
         
-        train_loader = DataLoader(train_dt, batch_size=bs, shuffle=True, num_workers=0)
-        test_loader = DataLoader(test_dt, batch_size=bs, num_workers=0)
+        train_loader = DataLoader(train_dt, batch_size=bs, shuffle=True, num_workers=dt.NUM_WORKERS)
+        test_loader = DataLoader(test_dt, batch_size=bs, num_workers=dt.NUM_WORKERS)
         
         return train_loader, test_loader
 

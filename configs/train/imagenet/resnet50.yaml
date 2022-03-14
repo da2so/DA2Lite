@@ -1,0 +1,29 @@
+DATASET:
+  NAME: imagenet
+  IMG_SHAPE: [3, 224, 224] 
+  ROOT_DIR: '/data/shared2/imagenet/'
+  NUM_WORKERS: 12
+  DATA_AUG: True
+
+MODEL:
+  NAME: resnet50_imagenet
+  NUM_CLASSES: 1000
+  PRE_TRAINED:
+    IS_USE: False
+
+TRAIN:
+  IS_USE: True 
+  OPTIMIZER: sgd
+  OPTIMIZER_ARGS:
+      MOMENTUM : 0.9
+      WEIGHT_DECAY: 5e-4
+  LOSS: categorical_crossentropy 
+  SCHEDULER: cosineannealLR 
+  SCHEDULER_ARGS:
+    T_MAX: 200
+  BATCH_SIZE: 256
+  EPOCHS: 200
+  LR: 0.1
+
+GPU:
+  IS_USE: True
