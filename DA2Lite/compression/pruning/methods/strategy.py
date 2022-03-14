@@ -17,7 +17,7 @@ class StragtegyBase(ABC):
         group_to_ratio = OrderedDict()
         for idx, i_group in enumerate(self.group_set):
             random_rate = self._get_ratio()
-            group_to_ratio[i_group] = vgg_16_bn[idx]
+            group_to_ratio[i_group] = random_rate #vgg_16_bn[idx]
 
 
         return group_to_ratio

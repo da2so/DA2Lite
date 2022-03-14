@@ -7,3 +7,4 @@ torchsummary==1.5.1
 tqdm==4.51.0
 tensorly==0.5.1
 scipy==1.5.4
+kmeans_pytorch==0.3

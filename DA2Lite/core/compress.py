@@ -78,7 +78,7 @@ class Compressor(object):
 
             trainer_class = self._get_trainer(train_cfg.NAME)
 
-            trainer = trainer_class(cfg_util=self.cfg_util,
+            self.trainer = trainer_class(cfg_util=self.cfg_util,
                                     train_cfg=train_cfg,
                                     prefix=prefix,
                                     model=compressed_model,
@@ -91,10 +91,10 @@ class Compressor(object):
                                     origin_summary=self.origin_summary
                                     )
 
-            test_acc, test_loss = trainer.evaluate(print_log=False)
+            test_acc, test_loss = self.trainer.evaluate(print_log=False)
             logger.info(f'Test accuracy right after {compress_name}: {test_acc*1e2:.2f} %\n')
 
-            compressed_model, compress_summary = trainer.build()
+            compressed_model, compress_summary = self.trainer.build()
             compress_num += 1
         logger.info(f'Compression End!\n')
 

@@ -40,9 +40,9 @@ class Pruner(object):
                                                         save_dir=self.save_dir
                                                         ).build()
 
-        for key, val in self.node_graph.items():
-            print(key)
-            print(val)
+        # for key, val in self.node_graph.items():
+        #     print(key)
+        #     print(val)
         del graph_model
         self.criteria_class = load_criteria(criteria_name=self.pruning_cfg.CRITERIA, 
                                             criteria_args=self.criteria_args,
@@ -131,7 +131,7 @@ class Pruner(object):
                                     group_set=self.group_set,
                                     pruning_ratio=self.pruning_cfg.STRATEGY_ARGS.PRUNING_RATIO).build()
 
-        print(group_to_ratio)
+        # print(group_to_ratio)
         #group_to_ratio = 
         node_graph = self.set_prune_idx(group_to_ratio, node_graph)
 

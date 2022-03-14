@@ -23,7 +23,7 @@ class NuclearNorm(CriteriaBase):
         h = size_of_fmaps[2]
         w = size_of_fmaps[3]
         
-        print(num_features)
+        # print(num_features)
         singular_values = torch.zeros((num_features)).to(device)
         tt =  torch.zeros((num_features)).to(device)
         
@@ -53,12 +53,12 @@ class NuclearNorm(CriteriaBase):
         n_to_prune = int(pruning_ratio*num_features)
         
 
-        print(f'n_to_prune: {n_to_prune}')
+        # print(f'n_to_prune: {n_to_prune}')
         threshold = torch.kthvalue(tt, k=n_to_prune).values 
-        print(threshold)
+        # print(threshold)
         removed_indices = torch.nonzero(tt <= threshold).view(-1).tolist()        
-        print(len(removed_indices))
-        print('\n\n')
+        # print(len(removed_indices))
+        # print('\n\n')
         return removed_indices
 
                 

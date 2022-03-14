@@ -26,9 +26,9 @@ class NewClustering(ClusteringBase):
         i_u, i_s, i_vh = torch.svd(weights)
  
         n_to_cluster = n - int(clustering_ratio * n)
-        print(i_u.size())
-        print(i_s.size())
-        print(i_vh.size())
+        # print(i_u.size())
+        # print(i_s.size())
+        # print(i_vh.size())
         i_sv = torch.matmul(i_vh, torch.diag(i_s))
 
         # kmeans
